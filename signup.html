@@ -40,6 +40,10 @@
         <input required id="password" type="password" minlength="6" placeholder="Create a password (6+ characters)" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
         <div>
           <input id="referral" placeholder="Membership number of the person who invited you" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        </div>
+        <div>
+          <input required id="signupZip" inputmode="numeric" placeholder="Your zip code" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+          <p class="muted" style="font-size:.8rem; margin-top:6px;">Once you're signed in, we'll automatically sort Directory, Jobs, Homeschool &amp; Community info for your area — no re-typing your zip every time.</p>
           <p class="muted" style="font-size:.8rem; margin-top:6px;">Without a valid member number, we can't create your account — that's what keeps this exclusive. Leave blank only if you believe the founding membership is still unclaimed.</p>
         </div>
         <div id="formError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
@@ -116,13 +120,13 @@
     await completeMembership(pending);
   }
 
-  async function completeMembership({ firstName, lastName, email, referral }) {
+  async function completeMembership({ firstName, lastName, email, referral, zip }) {
     const errorBox = document.getElementById("formError");
     let result;
     if (!referral) {
-      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: email });
+      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: email, p_zip: zip });
     } else {
-      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: email, p_referred_by: referral });
+      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: email, p_referred_by: referral, p_zip: zip });
     }
     if (result.error) {
       if (!referral && result.error.message.includes("Founder slot")) {
@@ -157,6 +161,7 @@
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const referral = document.getElementById("referral").value.trim();
+    const zip = document.getElementById("signupZip").value.trim();
 
     const { data, error } = await obcClient.auth.signUp({ email, password });
 
@@ -171,14 +176,14 @@
 
     if (!data.session) {
       // Email confirmation required before we have a session to call the signup RPC with.
-      sessionStorage.setItem("obcPendingSignup", JSON.stringify({ firstName, lastName, email, referral }));
+      sessionStorage.setItem("obcPendingSignup", JSON.stringify({ firstName, lastName, email, referral, zip }));
       document.getElementById("formStep").style.display = "none";
       document.getElementById("confirmEmail").textContent = email;
       document.getElementById("confirmStep").style.display = "block";
       return;
     }
 
-    await completeMembership({ firstName, lastName, email, referral });
+    await completeMembership({ firstName, lastName, email, referral, zip });
   });
 
   tryCompletePending();

@@ -94,9 +94,13 @@
   <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="data/prayer.js"></script>
 <script src="js/app.js"></script>
 <script>
+  obcRequireMember();
+
   // ---- Daily banner: rotate verse + motif by day of week ----
   const today = DAILY[new Date().getDay()];
   document.getElementById("verseText").textContent = `"${today.verse}"`;

@@ -58,16 +58,33 @@ async function uploadObcImage(file, memberId) {
 }
 
 // Real CLC Beauties products — read-only showcase, live from the same Supabase project.
+// Pulls a genuine spread across categories (wigs/bundles/hair_care first, since those are the
+// core beauty line — not just whatever happens to be flagged is_featured, which skewed toward
+// generic dropship accessories) and randomizes within each category so the showcase doesn't
+// show the exact same handful of products every visit.
 async function getClcBeautiesShowcase(limit) {
-  const { data, error } = await obcClient
-    .from("products")
-    .select("id,name,category,price,image_url")
-    .not("image_url", "is", null)
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(limit || 8);
-  if (error) { console.error(error); return []; }
-  return data;
+  const perCategory = Math.max(2, Math.ceil((limit || 8) / 4));
+  const categories = ["wigs", "bundles", "hair_care", "accessories", "nails"];
+  const seen = new Set();
+  const results = [];
+
+  for (const category of categories) {
+    if (results.length >= (limit || 8)) break;
+    const { data, error } = await obcClient
+      .from("products")
+      .select("id,name,category,price,image_url")
+      .eq("category", category)
+      .not("image_url", "is", null)
+      .limit(perCategory * 3); // overfetch, then sample client-side for variety
+    if (error) { console.error(error); continue; }
+    const shuffled = (data || []).sort(() => Math.random() - 0.5);
+    for (const p of shuffled) {
+      if (seen.has(p.id) || results.length >= (limit || 8)) break;
+      seen.add(p.id);
+      results.push(p);
+    }
+  }
+  return results;
 }
 
 function stars(rating) {

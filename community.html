@@ -61,6 +61,8 @@
   <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="data/community.js"></script>
 <script src="js/app.js"></script>
 <script>
@@ -92,20 +94,20 @@
       let linksHtml = "";
 
       if (a.linkType === "direct") {
-        linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${a.linkLabel} &rarr;</a>`;
+        linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${obcFaviconImg(a.linkUrl, 16)} ${a.linkLabel} &rarr;</a>`;
         if (a.secondaryUrl) {
-          linksHtml += ` <a href="${a.secondaryUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${a.secondaryLabel} &rarr;</a>`;
+          linksHtml += ` <a href="${a.secondaryUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${obcFaviconImg(a.secondaryUrl, 16)} ${a.secondaryLabel} &rarr;</a>`;
         }
       } else if (a.linkType === "mixed") {
-        linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${a.linkLabel} &rarr;</a>
-          <a href="${a.secondaryUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${a.secondaryLabel} &rarr;</a>`;
+        linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${obcFaviconImg(a.linkUrl, 16)} ${a.linkLabel} &rarr;</a>
+          <a href="${a.secondaryUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${obcFaviconImg(a.secondaryUrl, 16)} ${a.secondaryLabel} &rarr;</a>`;
       } else if (a.linkType === "curated311") {
         const match = findCurated311(city, state);
         linksHtml = match
-          ? `<a href="${match.url}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">Open ${match.name} &rarr;</a>`
-          : `<p class="muted" style="font-size:.85rem; margin:8px 0;">We don't have a direct 311 link for your city yet.</p><a href="${STATE_LOCAL_GOV_DIRECTORY}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:2px;">Find your city's official government site &rarr;</a>`;
+          ? `<a href="${match.url}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${obcFaviconImg(match.url, 16)} Open ${match.name} &rarr;</a>`
+          : `<p class="muted" style="font-size:.85rem; margin:8px 0;">We don't have a direct 311 link for your city yet.</p><a href="${STATE_LOCAL_GOV_DIRECTORY}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:2px;">${obcFaviconImg(STATE_LOCAL_GOV_DIRECTORY, 16)} Find your city's official government site &rarr;</a>`;
       } else if (a.linkType === "directoryFallback") {
-        linksHtml = `<a href="${STATE_LOCAL_GOV_DIRECTORY}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${a.linkLabel} &rarr;</a>`;
+        linksHtml = `<a href="${STATE_LOCAL_GOV_DIRECTORY}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${obcFaviconImg(STATE_LOCAL_GOV_DIRECTORY, 16)} ${a.linkLabel} &rarr;</a>`;
       }
 
       card.innerHTML = `
@@ -121,7 +123,13 @@
       grid.appendChild(card);
     });
   }
-  renderActions();
+
+  (async () => {
+    const me = await obcRequireMember();
+    if (!me) return;
+    if (me.zip) { document.getElementById("zipFilter").value = me.zip; }
+    renderActions();
+  })();
 </script>
 </body>
 </html>

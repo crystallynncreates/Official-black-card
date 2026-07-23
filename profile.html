@@ -70,6 +70,14 @@
         <p id="pBio">No bio yet.</p>
       </div>
       <div class="card">
+        <h4>Your Zip Code</h4>
+        <p class="muted" style="font-size:.85rem; margin-bottom:10px;">Directory, Jobs, Homeschool &amp; Community pages sort themselves to this automatically once you're signed in.</p>
+        <form id="zipForm" style="display:flex; gap:8px;">
+          <input id="zipInput" inputmode="numeric" placeholder="Zip code" style="flex:1; padding:10px 14px; border-radius:10px; border:1px solid var(--line); background:var(--panel-2); color:var(--cream);" />
+          <button type="submit" class="btn btn-ghost">Save</button>
+        </form>
+      </div>
+      <div class="card">
         <h4>Active Circles</h4>
         <p>You haven't joined a savings circle yet.</p>
         <a href="circles.html" class="btn btn-ghost">Browse circles &rarr;</a>
@@ -132,6 +140,13 @@
     document.getElementById("pAvatar").textContent = initials(`${me.first_name} ${me.last_name}`);
     document.getElementById("pMeta").textContent = "Member since " + new Date(me.joined_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
     document.getElementById("pBio").textContent = me.bio || "No bio yet.";
+    document.getElementById("zipInput").value = me.zip || "";
+    document.getElementById("zipForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const zip = document.getElementById("zipInput").value.trim();
+      await obcClient.from("obc_members").update({ zip }).eq("id", me.id);
+      me.zip = zip;
+    });
 
     // ---- Messages preview: real conversations from the DB ----
     const msgWrap = document.getElementById("msgPreview");

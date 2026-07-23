@@ -77,6 +77,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="data/directories.js"></script>
 <script src="js/app.js"></script>
 <script>
@@ -124,7 +126,7 @@
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <span class="tag tag-emerald">${l.category}</span>
+        <div style="display:flex; align-items:center; gap:8px;">${obcFaviconImg(l.url)}<span class="tag tag-emerald">${l.category}</span></div>
         <h3 style="margin-top:10px;">${l.name}</h3>
         <p>${l.desc}</p>
         <p class="muted">${l.city}, ${l.state}</p>
@@ -139,7 +141,7 @@
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <span class="tag tag-gold">${p.category}</span>
+      <div style="display:flex; align-items:center; gap:8px;">${obcFaviconImg(p.url)}<span class="tag tag-gold">${p.category}</span></div>
       <h3 style="margin-top:10px;">${p.name}</h3>
       <p>${p.note}</p>
       <a href="${p.url}" target="_blank" rel="noopener" class="btn btn-ghost">Visit site &rarr;</a>
@@ -147,7 +149,12 @@
     partnerGrid.appendChild(card);
   });
 
-  renderListings();
+  (async () => {
+    const me = await obcRequireMember();
+    if (!me) return;
+    if (me.zip) { document.getElementById("zipFilter").value = me.zip; }
+    renderListings();
+  })();
 </script>
 </body>
 </html>

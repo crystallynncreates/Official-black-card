@@ -48,6 +48,7 @@
           <input required id="finishLast" placeholder="Last name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
         </div>
         <input id="finishReferral" placeholder="Membership number of the person who invited you (leave blank only if founding membership is unclaimed)" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <input required id="finishZip" inputmode="numeric" placeholder="Your zip code" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
         <div id="finishError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
         <button type="submit" class="btn btn-primary">Finish Setup</button>
       </form>
@@ -110,13 +111,14 @@
     const firstName = document.getElementById("finishFirst").value.trim();
     const lastName = document.getElementById("finishLast").value.trim();
     const referral = document.getElementById("finishReferral").value.trim();
+    const zip = document.getElementById("finishZip").value.trim();
     const session = await obcGetSession();
 
     let result;
     if (!referral) {
-      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email });
+      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email, p_zip: zip });
     } else {
-      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email, p_referred_by: referral });
+      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email, p_referred_by: referral, p_zip: zip });
     }
 
     if (result.error) {

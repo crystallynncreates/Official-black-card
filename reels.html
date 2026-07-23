@@ -207,13 +207,10 @@
   });
 
   (async () => {
-    me = await obcGetMyMember();
-    if (me) {
-      document.getElementById("composerAvatar").textContent = initials(`${me.first_name} ${me.last_name}`);
-      document.getElementById("composerName").textContent = `Post as ${me.first_name}`;
-    } else {
-      document.getElementById("composerName").innerHTML = `<a href="login.html" style="color:var(--gold-bright);">Log in</a> to post a reel`;
-    }
+    me = await obcRequireMember();
+    if (!me) return;
+    document.getElementById("composerAvatar").textContent = initials(`${me.first_name} ${me.last_name}`);
+    document.getElementById("composerName").textContent = `Post as ${me.first_name}`;
     renderReels();
   })();
 </script>

@@ -53,9 +53,13 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="data/watch.js"></script>
 <script src="js/app.js"></script>
 <script>
+  obcRequireMember();
+
   const byDate = {};
   WATCH_ARTICLES.forEach(a => { (byDate[a.date] = byDate[a.date] || []).push(a); });
   const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
@@ -94,7 +98,7 @@
           <strong style="color:var(--emerald);">Why this matters to us</strong>
           <p style="margin:6px 0 0;">${a.relevance}</p>
         </div>
-        <a href="${a.sourceUrl}" target="_blank" rel="noopener" class="btn btn-ghost">${isBroadcast ? "Watch" : "Source"}: ${a.source} &rarr;</a>
+        <a href="${a.sourceUrl}" target="_blank" rel="noopener" class="btn btn-ghost">${obcFaviconImg(a.sourceUrl, 16)} ${isBroadcast ? "Watch" : "Source"}: ${a.source} &rarr;</a>
       `;
       grid.appendChild(card);
     });

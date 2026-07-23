@@ -1,3 +1,15 @@
+// Real favicon for any external link card — derived straight from the link's own domain
+// (no third-party favicon proxy, no Google). Used everywhere a search result/source has a URL.
+function obcFavicon(url) {
+  try { return new URL(url).origin + "/favicon.ico"; } catch (e) { return ""; }
+}
+function obcFaviconImg(url, size) {
+  const s = size || 20;
+  const src = obcFavicon(url);
+  if (!src) return "";
+  return `<img src="${src}" alt="" style="width:${s}px;height:${s}px;border-radius:4px;object-fit:contain;background:#fff;padding:2px;" onerror="this.style.display='none'" />`;
+}
+
 // Shared behavior across pages: mobile nav toggle + cart badge.
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector(".nav-toggle");
