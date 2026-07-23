@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Log In — Official Black Card</title>
+<title>Login — Official Black Card</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css" />
@@ -22,7 +22,7 @@
 <header class="hero" style="padding-bottom:10px;">
   <div class="container">
     <span class="eyebrow">&#9679; Members Only</span>
-    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Log in.</h1>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Login</h1>
     <p class="lead">Sign in with the email and password you joined with.</p>
   </div>
 </header>
@@ -35,7 +35,7 @@
         <input required id="loginEmail" type="email" placeholder="Email" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
         <input required id="loginPassword" type="password" placeholder="Password" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
         <div id="loginError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
-        <button type="submit" class="btn btn-primary" id="loginBtn">Log In</button>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
       </form>
     </div>
 
@@ -54,7 +54,7 @@
       </form>
     </div>
 
-    <div class="card" style="margin-top:20px; background:rgba(232,179,61,0.06); border-color:rgba(232,179,61,0.25);">
+    <div id="founderNote" class="card" style="display:none; margin-top:20px; background:rgba(232,179,61,0.06); border-color:rgba(232,179,61,0.25);">
       <strong style="color:var(--gold-bright);">First time here?</strong>
       <p style="margin:6px 0 0;">If nobody has claimed the founding membership yet, <a href="signup.html" style="color:var(--gold-bright); text-decoration:underline;">sign up</a> and leave the referral field blank to claim it.</p>
     </div>
@@ -93,7 +93,7 @@
     const { error } = await obcClient.auth.signInWithPassword({ email, password });
 
     btn.disabled = false;
-    btn.textContent = "Log In";
+    btn.textContent = "Login";
 
     if (error) {
       errorBox.style.display = "block";
@@ -132,9 +132,13 @@
   });
 
   // If they're already signed in (e.g. clicked back), skip straight to the right step.
+  // Otherwise, only show the "first time here" founder note while that slot is still unclaimed —
+  // once someone (Crystal) has signed in as the founder, it no longer applies to anyone.
   (async () => {
     const session = await obcGetSession();
-    if (session) await afterSignedIn();
+    if (session) { await afterSignedIn(); return; }
+    const { data: claimed } = await obcClient.rpc("obc_founder_claimed");
+    if (!claimed) { document.getElementById("founderNote").style.display = "block"; }
   })();
 </script>
 </body>

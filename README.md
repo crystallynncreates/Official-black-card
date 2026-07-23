@@ -45,7 +45,7 @@ Real backend, not a mock. Built on the Supabase project already in this account 
 | # | Domain | Status | File |
 |---|---|---|---|
 | 1 | Design system (palette, type, components) | ✅ Done | `css/styles.css` |
-| 2 | Landing page | ✅ Done | `index.html` |
+| 2 | Landing page | **Retired 2026-07-27** — `index.html` no longer shows the marketing/domains-grid page. Per Crystal's instruction ("make the landing page the login page"), the root URL now shows the same content as `login.html` directly — no separate splash page before login. See note below the table. | `index.html` |
 | 3 | Membership/profile (member number at top) | ✅ Done — **real backend**: Supabase Auth + Postgres, referral verification enforced server-side, Official Black Card issuance, see Backend section below | `profile.html`, `signup.html`, `login.html`, `welcome.html`, `js/supabase-client.js` |
 | 4 | Business/org directory (search + filters + partner sources) | ✅ Done (seed data only, ~7 sample listings + 36 partner links incl. an 18-strong Legal & Advocacy category — NAACP, LDF, SCLC, National Urban League, National Action Network, National Bar Association, Ben Crump Law, EJI, The Cochran Firm, Merritt Law, Stewart Miller Simmons, Rainbow PUSH, Color Of Change, UNCF, TMCF, NCNW, 100 Black Men of America, NABA) | `directory.html`, `data/directories.js` |
 | 5 | Group Savings Club (renamed from "Susu/Tanda/Pardna" 2026-07-25) | ✅ Done (demo UI, non-custodial design — app never touches money, deep-links to Cash App/Zelle) | `circles.html` |
@@ -65,6 +65,14 @@ Real backend, not a mock. Built on the Supabase project already in this account 
 | 19 | Wallstreet Shoppee (real marketplace: browse, product pages, seller storefronts, cart, checkout, seller onboarding/dashboard) | ✅ Done — **real backend 2026-07-25**, real photos throughout, see dedicated section below | `shop.html`, `product.html`, `store.html`, `cart.html`, `checkout.html`, `sell.html`, `js/shop-supabase.js` |
 | 20 | Invite / Share (contact picker + polished share message) | ✅ Done — see Membership section below | `invite.html` |
 | 21 | Messages + People You May Know (Facebook-style connections) | ✅ Done — see Membership section below | `messages.html`, profile.html additions |
+
+## Landing page = login page (2026-07-27)
+
+`index.html` and `login.html` are now **intentionally identical** in content/behavior — both show the sign-in form directly, both redirect a signed-in visitor straight to `profile.html`. This was a deliberate instruction ("make the landing page the login page, don't separate the words login"), not a bug or duplication to clean up. Kept as two files rather than making `login.html` redirect to `index.html` (or vice versa) because every `obcRequireMember()` gate across the app and every nav link already points at `login.html` specifically — changing that target across 20+ files was unnecessary risk for zero behavioral difference. **If you edit the login form/logic, edit both files identically** — there's no shared include (this is a plain static site, no templating), so they will drift if only one is touched. The old marketing/domains-grid landing page content was fully removed, not preserved elsewhere — if a public marketing splash is wanted again later, it needs to be rebuilt (or ask before assuming one is wanted, since removing it was itself a direct instruction).
+
+**"Login" is spelled as one word everywhere in the UI** (button labels, headings, page titles) per explicit instruction — not "Log In" or "Log in". Don't reintroduce the two-word form in any new page.
+
+**The "First time here?" founder note is now conditional.** It only shows while the founding membership (member #1) is still unclaimed — checked via a new `obc_founder_claimed()` Postgres function (`security definer`, returns a plain boolean, granted to `anon` + `authenticated` — deliberately exposes nothing about *who* the founder is, just whether the slot is taken, since the login page is public and `obc_members` itself requires auth to read). Once Crystal (or anyone) claims it, this note stops appearing for all future visitors, on both `index.html` and `login.html`.
 
 ## Membership: signup, referral verification & the Official Black Card
 

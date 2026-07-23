@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Official Black Card — Invitation-Only Black Community Platform</title>
-<meta name="description" content="A members-only platform for the Black community: business directory, savings circles, health & tech intel, prison & government watch, and more." />
+<title>Official Black Card</title>
+<meta name="description" content="Invitation-only community platform for the Black community. Sign in or request an invitation." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css" />
@@ -14,202 +14,132 @@
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
-    <div class="nav-links">
-      <a href="directory.html">Directory</a>
-      <a href="jobs.html">Jobs</a>
-      <a href="shop.html">Shoppe</a>
-      <a href="homeschool.html">Homeschool</a>
-      <a href="community.html">Community</a>
-      <a href="circles.html">Circles</a>
-      <a href="watch.html">Watch</a>
-      <a href="reels.html">Reels</a>
-      <a href="prayer.html">Prayer Corner</a>
-      <a href="profile.html">Profile</a>
-    </div>
-    <div style="display:flex; align-items:center; gap:12px;">
-      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
-      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
-      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
-      <a href="signup.html" class="nav-cta">Join</a>
-    </div>
-    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+    <div class="nav-links"></div>
+    <a href="signup.html" class="btn btn-ghost">Not a member? Join</a>
+    <button class="nav-toggle" aria-label="Menu" style="visibility:hidden;">&#9776;</button>
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero" style="padding-bottom:10px;">
   <div class="container">
-    <span class="eyebrow">&#9679; Invitation only &middot; Member #-issued</span>
-    <h1>Everything Black. <br />One card.</h1>
-    <p class="lead">The private platform for the Black community — find Black-owned everything, build wealth together, stay armed with the facts, and move as one when it matters most.</p>
-    <div class="hero-actions">
-      <a href="signup.html" class="btn btn-primary">Request Your Invitation</a>
-      <a href="#domains" class="btn btn-ghost">See what's inside</a>
-    </div>
+    <span class="eyebrow">&#9679; Members Only</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Login</h1>
+    <p class="lead">Sign in with the email and password you joined with.</p>
   </div>
 </header>
 
-<section class="section" id="domains">
-  <div class="container">
-    <div class="section-head center" style="margin-left:auto;margin-right:auto;">
-      <span class="kicker">The Platform</span>
-      <h2>Every part of your life. One platform.</h2>
-      <p>Everything is built for and by the culture — searchable, sourced, and always tied back to why it matters to us.</p>
+<section class="section" style="padding-top:10px;">
+  <div class="container" style="max-width:480px;">
+
+    <div id="loginStep" class="card">
+      <form id="loginForm" style="display:grid; gap:12px;">
+        <input required id="loginEmail" type="email" placeholder="Email" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <input required id="loginPassword" type="password" placeholder="Password" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <div id="loginError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
+      </form>
     </div>
 
-    <div class="grid grid-3">
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(232,179,61,.15);">&#127942;</div>
-        <span class="tag tag-gold">Membership</span>
-        <h3>Your Official Black Card</h3>
-        <p>Every member is issued a unique membership number, front and center on your profile.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(0,196,140,.15);">&#128269;</div>
-        <span class="tag tag-emerald">Directory</span>
-        <h3>Find Black-owned everything</h3>
-        <p>Businesses, banks, farms, doctors and orgs nationwide — sortable by city, state, and category, aggregated from the biggest Black business directories.</p>
-        <a href="directory.html" class="btn btn-ghost" style="margin-top:14px;">Browse directory &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(232,179,61,.15);">&#128722;</div>
-        <span class="tag tag-gold">Marketplace</span>
-        <h3>Wallstreet Shoppee</h3>
-        <p>A shop built like the app on your phone. Browse, buy, or set up your own storefront — payment goes straight to the seller's Cash App or Zelle.</p>
-        <a href="shop.html" class="btn btn-ghost" style="margin-top:14px;">Shop now &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(255,90,95,.15);">&#128176;</div>
-        <span class="tag tag-coral">Group Savings Club</span>
-        <h3>Group Savings Club</h3>
-        <p>Form a friend savings group. Everyone contributes, one person collects each round, straight to their Cash App or Zelle.</p>
-        <a href="circles.html" class="btn btn-ghost" style="margin-top:14px;">Start a circle &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(139,107,255,.18);">&#128240;</div>
-        <span class="tag tag-violet">Watch</span>
-        <h3>Prison &amp; Government Watch</h3>
-        <p>Daily-checked updates on prison systems &amp; government policy, filtered to Black issues, cited, archived, and explained in plain language.</p>
-        <a href="watch.html" class="btn btn-ghost" style="margin-top:14px;">Read the archive &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(0,196,140,.15);">&#127916;</div>
-        <span class="tag tag-emerald">Media</span>
-        <h3>Reels</h3>
-        <p>Post and watch short-form video from the community — vlogs, know-your-rights breakdowns, wins, everyday life. A feed built for us.</p>
-        <a href="reels.html" class="btn btn-ghost" style="margin-top:14px;">Watch Reels &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(232,179,61,.15);">&#129658;</div>
-        <span class="tag tag-gold">Health</span>
-        <h3>Health &amp; cutting-edge tech</h3>
-        <p>Conditions and care specific to Black health outcomes, plus breakthrough tech: executive physicals, 3D imaging, AI diagnostics.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(255,90,95,.15);">&#128188;</div>
-        <span class="tag tag-coral">Business Hub</span>
-        <h3>Start-up &amp; licensing hub</h3>
-        <p>Grants, free state-by-state business guides, and step-by-step checklists for business, gun, fishing &amp; gaming licenses.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(139,107,255,.18);">&#9888;&#65039;</div>
-        <span class="tag tag-violet">Accountability</span>
-        <h3>Discrimination reports</h3>
-        <p>BBB, Yelp &amp; Google review reports flagging businesses reported for unfair treatment, by city and state.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(232,179,61,.15);">&#128218;</div>
-        <span class="tag tag-gold">Education</span>
-        <h3>Homeschooling</h3>
-        <p>State-by-state laws and rights, free resources, extracurriculars, and K-12 grants &amp; ESAs — searchable by state, city &amp; zip.</p>
-        <a href="homeschool.html" class="btn btn-ghost" style="margin-top:14px;">Explore Homeschool &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(0,196,140,.15);">&#127968;</div>
-        <span class="tag tag-emerald">Civic</span>
-        <h3>Take Back Your Community</h3>
-        <p>Start a neighborhood watch, become a block captain, register to vote, join a rec board, report a pothole — with links for your exact area.</p>
-        <a href="community.html" class="btn btn-ghost" style="margin-top:14px;">Get involved &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(232,179,61,.15);">&#127968;</div>
-        <span class="tag tag-gold">Preparedness</span>
-        <h3>Off-grid &amp; survival guides</h3>
-        <p>Off-grid living, food prep &amp; canning, survival skills, and where to source military-grade MREs.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(255,90,95,.15);">&#129489;&#8205;&#129309;&#8205;&#129489;</div>
-        <span class="tag tag-coral">Caregiving</span>
-        <h3>Caregiving resources</h3>
-        <p>Support and guides for caregivers across every life stage.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(139,107,255,.18);">&#128196;</div>
-        <span class="tag tag-violet">Travel</span>
-        <h3>Passport help, every county</h3>
-        <p>How to apply for a U.S. passport, localized down to your city, town, and county.</p>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(0,196,140,.15);">&#128188;</div>
-        <span class="tag tag-emerald">Jobs</span>
-        <h3>Jobs &amp; apprenticeships</h3>
-        <p>Second-chance, youth, internship &amp; apprenticeship postings — every city, every county, updated daily with resume &amp; interview trends.</p>
-        <a href="jobs.html" class="btn btn-ghost" style="margin-top:14px;">Browse jobs &rarr;</a>
-      </div>
-      <div class="card">
-        <div class="icon-tile" style="background:rgba(232,179,61,.15);">&#128591;</div>
-        <span class="tag tag-gold">Faith</span>
-        <h3>Prayer Corner</h3>
-        <p>A new KJV scripture and gratitude thought every day, plus a wall to pray for others and ask for prayer.</p>
-        <a href="prayer.html" class="btn btn-ghost" style="margin-top:14px;">Visit Prayer Corner &rarr;</a>
-      </div>
+    <div id="finishStep" class="card" style="display:none;">
+      <strong style="color:var(--gold-bright);">Almost there — finish setting up your membership.</strong>
+      <p style="margin:6px 0 14px;">Your email is confirmed. We just need a couple more details to issue your card.</p>
+      <form id="finishForm" style="display:grid; gap:12px;">
+        <div style="display:flex; gap:10px;">
+          <input required id="finishFirst" placeholder="First name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+          <input required id="finishLast" placeholder="Last name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        </div>
+        <input id="finishReferral" placeholder="Membership number of the person who invited you (leave blank only if founding membership is unclaimed)" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <input required id="finishZip" inputmode="numeric" placeholder="Your zip code" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <div id="finishError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
+        <button type="submit" class="btn btn-primary">Finish Setup</button>
+      </form>
     </div>
-  </div>
-</section>
 
-<section class="section">
-  <div class="container">
-    <div class="card" style="padding:44px; display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;">
-      <div>
-        <span class="kicker">Membership</span>
-        <h2 class="mt-0">This is invitation only.</h2>
-        <p style="max-width:480px;">Request an invite, get verified, and receive your member number — it stays at the top of your profile for life.</p>
-      </div>
-      <a href="signup.html" class="btn btn-primary">Request Your Invitation</a>
+    <div id="founderNote" class="card" style="display:none; margin-top:20px; background:rgba(232,179,61,0.06); border-color:rgba(232,179,61,0.25);">
+      <strong style="color:var(--gold-bright);">First time here?</strong>
+      <p style="margin:6px 0 0;">If nobody has claimed the founding membership yet, <a href="signup.html" style="color:var(--gold-bright); text-decoration:underline;">sign up</a> and leave the referral field blank to claim it.</p>
     </div>
+
   </div>
 </section>
 
 <footer class="footer">
-  <div class="container footer-grid">
-    <div>
-      <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
-      <p style="margin-top:14px; max-width:280px;">A private platform built for the Black community, by the Black community.</p>
-    </div>
-    <div>
-      <h4 style="font-size:.85rem; text-transform:uppercase; color:var(--cream-dim); letter-spacing:.06em;">Platform</h4>
-      <p><a href="directory.html">Directory</a></p>
-      <p><a href="jobs.html">Jobs</a></p>
-      <p><a href="shop.html">Shoppe</a></p>
-      <p><a href="homeschool.html">Homeschool</a></p>
-      <p><a href="community.html">Community</a></p>
-      <p><a href="circles.html">Group Savings Club</a></p>
-      <p><a href="watch.html">Watch</a></p>
-      <p><a href="reels.html">Reels</a></p>
-    </div>
-    <div>
-      <h4 style="font-size:.85rem; text-transform:uppercase; color:var(--cream-dim); letter-spacing:.06em;">Member</h4>
-      <p><a href="profile.html">Profile</a></p>
-      <p><a href="signup.html">Request Invitation</a></p>
-      <p><a href="messages.html">Messages</a></p>
-    </div>
-    <div>
-      <h4 style="font-size:.85rem; text-transform:uppercase; color:var(--cream-dim); letter-spacing:.06em;">About</h4>
-      <p>Crystal Lynn Creates</p>
-      <p>&copy; 2026</p>
-    </div>
-  </div>
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
 <script src="js/app.js"></script>
+<script>
+  async function afterSignedIn() {
+    const member = await obcGetMyMember();
+    if (member) {
+      window.location.href = "profile.html";
+      return;
+    }
+    document.getElementById("loginStep").style.display = "none";
+    document.getElementById("finishStep").style.display = "block";
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.getElementById("loginError");
+    errorBox.style.display = "none";
+    const btn = document.getElementById("loginBtn");
+    btn.disabled = true;
+    btn.textContent = "Logging in...";
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const { error } = await obcClient.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false;
+    btn.textContent = "Login";
+
+    if (error) {
+      errorBox.style.display = "block";
+      errorBox.textContent = error.message;
+      return;
+    }
+    await afterSignedIn();
+  });
+
+  document.getElementById("finishForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.getElementById("finishError");
+    errorBox.style.display = "none";
+
+    const firstName = document.getElementById("finishFirst").value.trim();
+    const lastName = document.getElementById("finishLast").value.trim();
+    const referral = document.getElementById("finishReferral").value.trim();
+    const zip = document.getElementById("finishZip").value.trim();
+    const session = await obcGetSession();
+
+    let result;
+    if (!referral) {
+      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email, p_zip: zip });
+    } else {
+      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email, p_referred_by: referral, p_zip: zip });
+    }
+
+    if (result.error) {
+      errorBox.style.display = "block";
+      errorBox.textContent = result.error.message.includes("INVALID_REFERRAL")
+        ? "We don't recognize that membership number."
+        : result.error.message;
+      return;
+    }
+    window.location.href = "profile.html";
+  });
+
+  // If they're already signed in, skip straight to the right step. Otherwise only show the
+  // "first time here" founder note while that slot is still unclaimed.
+  (async () => {
+    const session = await obcGetSession();
+    if (session) { await afterSignedIn(); return; }
+    const { data: claimed } = await obcClient.rpc("obc_founder_claimed");
+    if (!claimed) { document.getElementById("founderNote").style.display = "block"; }
+  })();
+</script>
 </body>
 </html>
