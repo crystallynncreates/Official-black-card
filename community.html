@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Take Back Your Community — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
+      <a href="signup.html" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:16px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Your block &middot; your city &middot; your rights</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Take Back Your Community</h1>
+    <p class="lead">You have the right to be part of what happens where you live. Here's how to actually do it — step by step, with a direct link for your exact area.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="search-bar">
+      <select id="stateFilter" class="sb-state"><option value="">State</option></select>
+      <input id="cityFilter" class="sb-city" type="text" placeholder="City" />
+      <input id="zipFilter" class="sb-zip" type="text" inputmode="numeric" placeholder="Zip code" />
+      <button class="btn btn-primary" onclick="renderActions()">Find my local links</button>
+    </div>
+    <p class="muted" style="margin-top:12px;">Enter your city/state and every card below will link straight to a search for your exact area. Leave it blank to see the general/nationwide links.</p>
+
+    <div class="grid grid-2" id="actionsGrid" style="margin-top:24px;"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="data/community.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"];
+  const stateSelect = document.getElementById("stateFilter");
+  US_STATES.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s; opt.textContent = s;
+    stateSelect.appendChild(opt);
+  });
+
+  function localSearchUrl(query, city, state, zip) {
+    const place = [city, state, zip].filter(Boolean).join(" ") || "your area";
+    return `https://www.google.com/search?q=${encodeURIComponent(place + " " + query)}`;
+  }
+
+  function renderActions() {
+    const city = document.getElementById("cityFilter").value.trim();
+    const state = stateSelect.value;
+    const zip = document.getElementById("zipFilter").value.trim();
+    const hasLocation = !!(city || state || zip);
+    const grid = document.getElementById("actionsGrid");
+    grid.innerHTML = "";
+
+    CIVIC_ACTIONS.forEach(a => {
+      const card = document.createElement("div");
+      card.className = "card";
+      let linksHtml = "";
+
+      if (a.linkType === "direct") {
+        linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${a.linkLabel} &rarr;</a>`;
+        if (a.secondaryUrl) {
+          linksHtml += ` <a href="${a.secondaryUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${a.secondaryLabel} &rarr;</a>`;
+        }
+      } else if (a.linkType === "mixed") {
+        linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${a.linkLabel} &rarr;</a>
+          <a href="${localSearchUrl(a.localQuery, city, state, zip)}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${hasLocation ? "Your state's permit rules" : "Find your state's permit rules"} &rarr;</a>`;
+      } else {
+        linksHtml = `<a href="${localSearchUrl(a.localQuery, city, state, zip)}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${hasLocation ? a.linkLabel.replace("your city", city || state || "your area") : a.linkLabel} &rarr;</a>`;
+      }
+
+      card.innerHTML = `
+        <div class="icon-tile" style="background:rgba(232,179,61,.12); font-size:1.4rem;">${a.icon}</div>
+        <span class="tag ${a.tagClass}">${a.tag}</span>
+        <h3 style="margin-top:10px;">${a.title}</h3>
+        <p>${a.overview}</p>
+        <ol style="color:var(--cream-dim); padding-left:20px; margin:10px 0; font-size:.92rem; line-height:1.8;">
+          ${a.steps.map(s => `<li>${s}</li>`).join("")}
+        </ol>
+        <div>${linksHtml}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+  renderActions();
+</script>
+</body>
+</html>

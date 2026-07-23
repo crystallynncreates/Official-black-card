@@ -1,0 +1,112 @@
+// Seed data for "Take Back Your Community" — civic action hub.
+// Two kinds of links per action:
+//  - direct: a single authoritative nationwide source (e.g. vote.gov) — same for everyone.
+//  - local: these services are run by ~19,000 different cities/counties, so instead of guessing
+//    a URL that will 404, we build a live search query from whatever city/state/zip the member
+//    typed, pointed at the right search terms. Honest and actually works, vs. a fabricated link.
+
+const CIVIC_ACTIONS = [
+  {
+    id: "watch",
+    title: "Start a Neighborhood Watch",
+    tag: "Safety",
+    tagClass: "tag-emerald",
+    icon: "&#128064;",
+    overview: "Any resident can start one. Watch members are extra eyes and ears — you observe and report to police, you don't confront or take enforcement action yourself.",
+    steps: ["Talk to neighbors and gauge interest", "Contact local law enforcement's community policing office to set up a kickoff meeting", "Register your group for free at the National Neighborhood Watch site", "Agree on how members will report suspicious activity"],
+    linkType: "direct",
+    linkLabel: "Register at National Neighborhood Watch",
+    linkUrl: "https://www.nnw.org/getting-started",
+  },
+  {
+    id: "captain",
+    title: "Become a Block Captain",
+    tag: "Leadership",
+    tagClass: "tag-gold",
+    icon: "&#127968;",
+    overview: "Block captains are the point person for their block — sharing city/neighborhood-association updates, organizing clean-ups, and being the first call when something's wrong. Programs are run city-by-city.",
+    steps: ["Find your city or neighborhood association's block captain program", "Some cities require a petition signed by a majority of your block", "Attend an orientation/training session", "Start relaying updates and organizing your block"],
+    linkType: "local",
+    linkLabel: "Find your city's block captain program",
+    localQuery: "block captain program",
+  },
+  {
+    id: "vote",
+    title: "Register to Vote",
+    tag: "Civic Rights",
+    tagClass: "tag-violet",
+    icon: "&#128233;",
+    overview: "Every citizen 18+ has the right to register. Rules on registering after a felony conviction vary significantly by state — some restore rights automatically, some require an application. Check your state's specific rule if this applies to you.",
+    steps: ["Go to vote.gov and select your state", "Register online where available, or print/mail the National Mail Voter Registration Form", "Confirm your polling place before election day", "Consider becoming a paid poll worker through the EAC lookup tool"],
+    linkType: "direct",
+    linkLabel: "Register at Vote.gov",
+    linkUrl: "https://vote.gov/",
+    secondaryLabel: "Become a poll worker (EAC)",
+    secondaryUrl: "https://www.eac.gov/help-america-vote",
+  },
+  {
+    id: "gun",
+    title: "Get a Gun License / Permit",
+    tag: "Rights",
+    tagClass: "tag-coral",
+    icon: "&#128737;",
+    overview: "There are two different systems: a Federal Firearms License (FFL) from the ATF is for people in the business of selling/manufacturing firearms. Personal ownership/carry permits are issued by your state, and requirements range from no permit needed (\"constitutional carry\") to a full application, training, and background check — it varies a lot by state.",
+    steps: ["Decide if you need a personal carry permit (state) or a business FFL (federal)", "For a business FFL, apply directly through ATF", "For a personal permit, find your state's specific process below", "Complete any required safety training and background check"],
+    linkType: "mixed",
+    linkLabel: "ATF Federal Firearms Licenses",
+    linkUrl: "https://www.atf.gov/firearms/federal-firearms-licenses",
+    localQuery: "gun permit application requirements",
+  },
+  {
+    id: "recboard",
+    title: "Join a Recreation Center Board",
+    tag: "Leadership",
+    tagClass: "tag-emerald",
+    icon: "&#127942;",
+    overview: "Most parks & recreation advisory boards are open to any resident — often you just need to attend a meeting and sign in, or submit a short application. Some require you to live or own property in the city.",
+    steps: ["Find your city's Parks & Recreation Board or Advisory Council", "Attend a public meeting (this alone often qualifies you as a member)", "Or submit a board application/self-nomination if your city requires one"],
+    linkType: "local",
+    linkLabel: "Find your local parks & recreation board",
+    localQuery: "parks and recreation advisory board join",
+  },
+  {
+    id: "reportcrime",
+    title: "Report a Crime",
+    tag: "Safety",
+    tagClass: "tag-gold",
+    icon: "&#128222;",
+    overview: "Call 911 for anything happening right now that threatens life, health, or property. For something after the fact (a break-in you just discovered, an ongoing pattern), use your local police non-emergency line.",
+    steps: ["Life-threatening or in-progress? Call 911", "Otherwise, call your local police non-emergency number", "Many departments also accept online reports for minor incidents", "Ask for a case/report number for your records"],
+    linkType: "local",
+    linkLabel: "Find your local police non-emergency number",
+    localQuery: "police non-emergency number report a crime",
+  },
+  {
+    id: "pothole",
+    title: "Report a Pothole",
+    tag: "Neighborhood",
+    tagClass: "tag-violet",
+    icon: "&#128679;",
+    overview: "Most cities route this through 311 — a non-emergency number/portal for city services, separate from 911. You describe the problem once and it's routed to public works.",
+    steps: ["Note the exact location (nearest cross streets or address)", "Call 311 or use your city's 311 app/website", "Include a photo if the portal allows it", "Save your service request number to check status"],
+    linkType: "local",
+    linkLabel: "Find your city's 311 / pothole reporting",
+    localQuery: "311 report a pothole",
+  },
+  {
+    id: "streetclean",
+    title: "Street Cleaning Schedule & Reporting",
+    tag: "Neighborhood",
+    tagClass: "tag-coral",
+    icon: "&#129529;",
+    overview: "Street cleaning schedules and missed-cleaning reports are also handled through your city's 311 system in most places.",
+    steps: ["Look up your street's cleaning schedule on your city's site or 311 app", "Report a missed cleaning through 311", "Sign up for street-cleaning alerts/reminders if your city offers them"],
+    linkType: "local",
+    linkLabel: "Find your city's street cleaning info",
+    localQuery: "311 street cleaning schedule",
+  },
+];
+
+if (typeof module !== "undefined") {
+  module.exports = { CIVIC_ACTIONS };
+}

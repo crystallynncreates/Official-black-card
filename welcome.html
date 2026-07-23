@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links"></div>
+    <a href="profile.html" class="btn btn-ghost">Go to profile</a>
+    <button class="nav-toggle" aria-label="Menu" style="visibility:hidden;">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:10px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Welcome</span>
+    <h1 id="welcomeHeading" style="font-size:clamp(2rem,4vw,2.8rem);">Welcome to Official Black Card.</h1>
+    <p class="lead" id="welcomeSub">You're in. Here's everything you now have access to.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container" style="max-width:720px;">
+    <div class="card" id="memberRecap" style="display:none;"></div>
+
+    <div class="card" style="margin-top:20px;">
+      <p>You now carry a membership number, verified by someone already inside this community. That number is yours for life — it's the first thing people see on your profile, and it's what you'll hand down when you invite someone new.</p>
+      <p style="margin-bottom:0;">Here's a quick tour of what's here for you:</p>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card"><span class="tag tag-emerald">Directory</span><h3 style="margin-top:8px;">Find Black-owned everything</h3><p>Businesses, banks, farms, doctors, nationwide.</p><a href="directory.html" class="btn btn-ghost">Browse &rarr;</a></div>
+      <div class="card"><span class="tag tag-gold">Marketplace</span><h3 style="margin-top:8px;">Back To Wallstreet Shoppe</h3><p>Shop Black-owned, or open your own storefront.</p><a href="shop.html" class="btn btn-ghost">Shop &rarr;</a></div>
+      <div class="card"><span class="tag tag-coral">Money</span><h3 style="margin-top:8px;">Savings Circles</h3><p>Susu/tanda-style group saving with people you trust.</p><a href="circles.html" class="btn btn-ghost">Start a circle &rarr;</a></div>
+      <div class="card"><span class="tag tag-violet">Jobs</span><h3 style="margin-top:8px;">Jobs &amp; Apprenticeships</h3><p>Second-chance, youth &amp; internship postings, daily.</p><a href="jobs.html" class="btn btn-ghost">Browse &rarr;</a></div>
+      <div class="card"><span class="tag tag-gold">Education</span><h3 style="margin-top:8px;">Homeschooling</h3><p>State laws, rights, resources &amp; K-12 grants.</p><a href="homeschool.html" class="btn btn-ghost">Explore &rarr;</a></div>
+      <div class="card"><span class="tag tag-emerald">Civic</span><h3 style="margin-top:8px;">Take Back Your Community</h3><p>Neighborhood watch, voting, block captain &amp; more.</p><a href="community.html" class="btn btn-ghost">Get involved &rarr;</a></div>
+      <div class="card"><span class="tag tag-violet">Info</span><h3 style="margin-top:8px;">Prison &amp; Government Watch</h3><p>Daily-checked news, cited, explained, archived.</p><a href="watch.html" class="btn btn-ghost">Read &rarr;</a></div>
+      <div class="card"><span class="tag tag-gold">Faith</span><h3 style="margin-top:8px;">Prayer Corner</h3><p>Daily scripture, gratitude, and a wall to pray for others.</p><a href="prayer.html" class="btn btn-ghost">Visit &rarr;</a></div>
+      <div class="card"><span class="tag tag-coral">Media</span><h3 style="margin-top:8px;">Reels</h3><p>Vlogs, wins, know-your-rights clips from the community.</p><a href="reels.html" class="btn btn-ghost">Watch &rarr;</a></div>
+      <div class="card"><span class="tag tag-emerald">Social</span><h3 style="margin-top:8px;">Messages &amp; Connections</h3><p>Message other members and grow your circle.</p><a href="messages.html" class="btn btn-ghost">Open &rarr;</a></div>
+    </div>
+
+    <div class="card" style="margin-top:24px; text-align:center;">
+      <h3>Ready to invite someone?</h3>
+      <p>You can now vouch for people you trust — friends, family, anyone who carries the same spirit.</p>
+      <a href="invite.html" class="btn btn-primary">Invite someone &rarr;</a>
+      <a href="profile.html" class="btn btn-ghost">Go to my profile &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  (async () => {
+    const me = await obcRequireMember();
+    if (!me) return;
+
+    document.getElementById("welcomeHeading").textContent = `Welcome, ${me.first_name}.`;
+    document.getElementById("welcomeSub").textContent = "Your membership is active. Here's everything you now have access to.";
+
+    let referrerLabel = "—";
+    if (me.referred_by) {
+      const { data: referrer } = await obcClient.from("obc_members").select("first_name,last_name,membership_number").eq("membership_number", me.referred_by).maybeSingle();
+      if (referrer) referrerLabel = `${referrer.first_name} ${referrer.last_name} (${obcFormatMemberNumber(referrer.membership_number)})`;
+    }
+
+    const recap = document.getElementById("memberRecap");
+    recap.style.display = "block";
+    recap.innerHTML = `
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div><div class="muted" style="font-size:.78rem; text-transform:uppercase;">Membership Number</div><div style="font-family:var(--font-display); color:var(--gold-bright); font-size:1.2rem;">${obcFormatMemberNumber(me.membership_number)}</div></div>
+        <div><div class="muted" style="font-size:.78rem; text-transform:uppercase;">Member Since</div><div>${new Date(me.joined_at).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</div></div>
+        <div><div class="muted" style="font-size:.78rem; text-transform:uppercase;">Invited By</div><div>${referrerLabel}</div></div>
+      </div>
+    `;
+  })();
+</script>
+</body>
+</html>

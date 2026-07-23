@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Homeschooling — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
+      <a href="signup.html" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:16px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Every state &middot; every district</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Homeschooling</h1>
+    <p class="lead">Know your rights, know the law, know what your school district owes your family — plus free resources, extracurriculars, and grants for K-12 kids.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="card" style="border-color: rgba(255,90,95,0.35); background: linear-gradient(180deg, rgba(255,90,95,0.07), var(--panel-2));">
+      <strong style="color:var(--coral);">Not legal advice.</strong>
+      <p style="margin:6px 0 0;">Homeschool law changes and varies by state. We only state a specific legal requirement when we're confident it's accurate and current — everywhere else, we link you straight to <a href="https://hslda.org/legal/" target="_blank" rel="noopener" style="color:var(--gold-bright); text-decoration:underline;">HSLDA</a> and your state Department of Education so you get it from the source, not a guess.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container">
+    <div class="search-bar">
+      <select id="stateFilter" class="sb-state"><option value="">State</option></select>
+      <input id="cityFilter" class="sb-city" type="text" placeholder="City" />
+      <input id="zipFilter" class="sb-zip" type="text" inputmode="numeric" placeholder="Zip code" />
+      <button class="btn btn-primary" onclick="renderState()">Search</button>
+    </div>
+
+    <div id="stateResult" style="margin-top:24px;"></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="grid grid-2">
+      <div class="card">
+        <span class="tag tag-emerald">Your rights</span>
+        <h3 style="margin-top:10px;">What your school district owes homeschoolers</h3>
+        <p>In most states, homeschool families have the right to: request textbooks/materials the district must provide free of charge in some states, dual-enroll in community college courses, and access special-education evaluation services through the district if needed. Exact rules are set state-by-state and sometimes district-by-district.</p>
+        <p style="margin-top:10px;"><strong style="color:var(--gold-bright);">Equal access to extracurriculars:</strong> <span id="equalAccessNote"></span></p>
+      </div>
+      <div class="card">
+        <span class="tag tag-gold">Free resources</span>
+        <h3 style="margin-top:10px;">Where to start</h3>
+        <div id="orgSources"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">Funding</span>
+      <h2>K-12 grants &amp; Education Savings Accounts</h2>
+      <p>Public ESA programs and private-sector scholarships that can offset homeschool or extracurricular costs.</p>
+    </div>
+    <div class="card" style="margin-bottom:20px;">
+      <h4>States with active K-12 ESA programs</h4>
+      <p class="muted">Not every ESA program lets independent homeschoolers (vs. private-school students) use the funds — verify eligibility with your state's program before counting on it.</p>
+      <div class="filters" id="esaStates"></div>
+    </div>
+    <div class="grid grid-3" id="grantsGrid"></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">In your area</span>
+      <h2>Local extracurriculars for homeschoolers</h2>
+      <p class="muted">Demo data — search above to see activities matched to your area once the local activity directory is populated.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card"><span class="tag tag-violet">Sports</span><h3 style="margin-top:10px;">Homeschool Athletic Co-op</h3><p>Flag football, basketball & track leagues for homeschool students.</p></div>
+      <div class="card"><span class="tag tag-emerald">Academic</span><h3 style="margin-top:10px;">Community Center Study Hall</h3><p>Weekly tutoring & group study sessions at your local library or rec center.</p></div>
+      <div class="card"><span class="tag tag-coral">Arts</span><h3 style="margin-top:10px;">Youth Theater Co-op</h3><p>Homeschool drama, choir, and art classes hosted at community spaces.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="data/homeschool.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"];
+  const stateSelect = document.getElementById("stateFilter");
+  US_STATES.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s; opt.textContent = s;
+    stateSelect.appendChild(opt);
+  });
+
+  document.getElementById("equalAccessNote").textContent = EQUAL_ACCESS_NOTE;
+
+  const orgWrap = document.getElementById("orgSources");
+  HOMESCHOOL_ORG_SOURCES.forEach(s => {
+    const p = document.createElement("p");
+    p.innerHTML = `<a href="${s.url}" target="_blank" rel="noopener" style="color:var(--gold-bright); text-decoration:underline;">${s.name}</a> — ${s.note}`;
+    orgWrap.appendChild(p);
+  });
+
+  const esaWrap = document.getElementById("esaStates");
+  ESA_STATES.forEach(s => {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.style.cursor = "default";
+    chip.textContent = s;
+    esaWrap.appendChild(chip);
+  });
+
+  const grantsGrid = document.getElementById("grantsGrid");
+  PRIVATE_GRANTS.forEach(g => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<h3>${g.name}</h3><p>${g.note}</p><a href="${g.url}" target="_blank" rel="noopener" class="btn btn-ghost">Visit site &rarr;</a>`;
+    grantsGrid.appendChild(card);
+  });
+
+  function renderState() {
+    const state = stateSelect.value;
+    const result = document.getElementById("stateResult");
+    if (!state) {
+      result.innerHTML = `<p class="muted">Choose a state above to see what we know about its homeschool law.</p>`;
+      return;
+    }
+    const info = CONFIRMED_STATE_LAWS[state];
+    if (info) {
+      result.innerHTML = `
+        <div class="card" style="border-color: rgba(232,179,61,0.4);">
+          <span class="tag tag-gold">${info.tier} regulation</span>
+          <h3 style="margin-top:10px;">${state} at a glance</h3>
+          <p>${REG_TIER_INFO[info.tier]}</p>
+          <p><strong>What we know:</strong> ${info.note}</p>
+          <a href="${info.source}" target="_blank" rel="noopener" class="btn btn-ghost">Verify current requirements: HSLDA &rarr;</a>
+        </div>`;
+    } else {
+      result.innerHTML = `
+        <div class="card">
+          <span class="tag tag-coral">Verify directly</span>
+          <h3 style="margin-top:10px;">${state} — we haven't confirmed specifics yet</h3>
+          <p>Rather than guess, we're sending you straight to the source. HSLDA keeps a state-by-state map that's kept current.</p>
+          <a href="https://hslda.org/legal/" target="_blank" rel="noopener" class="btn btn-ghost">Check ${state} on HSLDA &rarr;</a>
+        </div>`;
+    }
+  }
+  renderState();
+</script>
+</body>
+</html>

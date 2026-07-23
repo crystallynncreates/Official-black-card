@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Join — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links"></div>
+    <a href="index.html" class="btn btn-ghost">Back home</a>
+    <button class="nav-toggle" aria-label="Menu" style="visibility:hidden;">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:10px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Invitation only</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Join Official Black Card</h1>
+    <p class="lead">Membership is by invitation only. You'll need the membership number of the person who invited you — unless the founding membership is still unclaimed.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container" style="max-width:560px;">
+
+    <div id="formStep" class="card">
+      <form id="signupForm" style="display:grid; gap:12px;">
+        <div style="display:flex; gap:10px;">
+          <input required id="firstName" placeholder="First name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+          <input required id="lastName" placeholder="Last name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        </div>
+        <input required id="email" type="email" placeholder="Email" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <input required id="password" type="password" minlength="6" placeholder="Create a password (6+ characters)" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <div>
+          <input id="referral" placeholder="Membership number of the person who invited you" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+          <p class="muted" style="font-size:.8rem; margin-top:6px;">Without a valid member number, we can't create your account — that's what keeps this exclusive. Leave blank only if you believe the founding membership is still unclaimed.</p>
+        </div>
+        <div id="formError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Verify &amp; Join</button>
+      </form>
+    </div>
+
+    <div id="confirmStep" class="card" style="display:none; text-align:center;">
+      <div style="font-size:2.2rem;">&#128231;</div>
+      <h3>Check your email</h3>
+      <p>We sent a confirmation link to <strong id="confirmEmail"></strong>. Click it, then come back and <a href="login.html" style="color:var(--gold-bright); text-decoration:underline;">log in</a> to finish setting up your membership.</p>
+    </div>
+
+    <div id="revealStep" style="display:none; text-align:center;">
+      <p class="muted" style="text-transform:uppercase; letter-spacing:.08em; font-size:.8rem; margin-bottom:18px;">&#10003; Membership verified</p>
+
+      <div class="official-card">
+        <div class="cw-top">
+          <div>
+            <div class="cw-brand">Official Black Card</div>
+          </div>
+          <div class="cw-chip"></div>
+        </div>
+        <div>
+          <div class="cw-number" id="cardNumber"></div>
+          <div class="cw-name" id="cardName"></div>
+          <div class="cw-since" id="cardSince"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:32px; text-align:left;">
+        <p style="font-size:1.05rem; color:var(--cream);">Official Black Card — and it isn't given lightly.</p>
+        <p>Official Black Card is invitation-only. Every member here was vouched for by someone who believed they belonged, and now you carry that same trust. Use this space to stay connected, and to build the kind of brotherly and sisterly bonds that strengthen not just your own home, but our communities across this nation and around the world.</p>
+        <p style="margin-bottom:0;">And when you meet a Black person who carries that same spirit — invite them. Growing our communities from within is the whole point.</p>
+      </div>
+
+      <div style="display:flex; gap:12px; justify-content:center; margin-top:24px; flex-wrap:wrap;">
+        <a href="welcome.html" class="btn btn-primary">Continue to Welcome &rarr;</a>
+        <a href="invite.html" class="btn btn-ghost">Invite someone now</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  function showCard(member) {
+    document.getElementById("formStep").style.display = "none";
+    document.getElementById("confirmStep").style.display = "none";
+    const step = document.getElementById("revealStep");
+    step.style.display = "block";
+    document.getElementById("cardNumber").textContent = obcFormatMemberNumber(member.membership_number);
+    document.getElementById("cardName").textContent = `${member.first_name} ${member.last_name}`;
+    document.getElementById("cardSince").textContent = "Member since " + new Date(member.joined_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  }
+
+  // If they've already confirmed their email and have a session but no member row yet
+  // (e.g. they left this tab open then clicked the email link), finish signup automatically
+  // using whatever they typed before submitting.
+  async function tryCompletePending() {
+    const pending = JSON.parse(sessionStorage.getItem("obcPendingSignup") || "null");
+    if (!pending) return;
+    const session = await obcGetSession();
+    if (!session) return;
+    const existing = await obcGetMyMember();
+    if (existing) { sessionStorage.removeItem("obcPendingSignup"); showCard(existing); return; }
+    await completeMembership(pending);
+  }
+
+  async function completeMembership({ firstName, lastName, email, referral }) {
+    const errorBox = document.getElementById("formError");
+    let result;
+    if (!referral) {
+      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: email });
+    } else {
+      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: email, p_referred_by: referral });
+    }
+    if (result.error) {
+      if (!referral && result.error.message.includes("Founder slot")) {
+        document.getElementById("formStep").style.display = "block";
+        document.getElementById("confirmStep").style.display = "none";
+        errorBox.style.display = "block";
+        errorBox.textContent = "The founding membership is already claimed. Enter the membership number of whoever invited you instead.";
+        return;
+      }
+      document.getElementById("formStep").style.display = "block";
+      document.getElementById("confirmStep").style.display = "none";
+      errorBox.style.display = "block";
+      errorBox.textContent = result.error.message.includes("INVALID_REFERRAL")
+        ? "We don't recognize that membership number. Double check it with whoever invited you."
+        : result.error.message;
+      return;
+    }
+    sessionStorage.removeItem("obcPendingSignup");
+    showCard(result.data);
+  }
+
+  document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.getElementById("formError");
+    errorBox.style.display = "none";
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Verifying...";
+
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const referral = document.getElementById("referral").value.trim();
+
+    const { data, error } = await obcClient.auth.signUp({ email, password });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Verify & Join";
+
+    if (error) {
+      errorBox.style.display = "block";
+      errorBox.textContent = error.message;
+      return;
+    }
+
+    if (!data.session) {
+      // Email confirmation required before we have a session to call the signup RPC with.
+      sessionStorage.setItem("obcPendingSignup", JSON.stringify({ firstName, lastName, email, referral }));
+      document.getElementById("formStep").style.display = "none";
+      document.getElementById("confirmEmail").textContent = email;
+      document.getElementById("confirmStep").style.display = "block";
+      return;
+    }
+
+    await completeMembership({ firstName, lastName, email, referral });
+  });
+
+  tryCompletePending();
+</script>
+</body>
+</html>

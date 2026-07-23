@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profile — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Switch member</a>
+      <a href="invite.html" class="nav-cta">Invite</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:20px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Member Profile</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Your Official Black Card</h1>
+    <p class="lead" style="margin-bottom:8px;">Membership number is issued on approval and stays at the top of your profile — it's your identity across the whole platform.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:20px;">
+  <div class="container" style="max-width:760px;">
+
+    <!-- Membership number: always first thing on the profile -->
+    <div class="member-card">
+      <div class="mc-top">
+        <div class="member-number">
+          <small>Membership No.</small>
+          <span id="pNumber">OBC &middot; 004521</span>
+        </div>
+        <span class="tag tag-gold">Verified Member</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div id="pAvatar" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--coral));display:grid;place-items:center;font-family:var(--font-display);font-weight:700;color:var(--black);font-size:1.3rem;">CN</div>
+        <div>
+          <h3 id="pName" style="margin-bottom:2px;">Crystal N.</h3>
+          <p id="pMeta" style="margin:0;">Member since July 2026</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:24px;">
+      <div class="card">
+        <h4>About</h4>
+        <p id="pBio">No bio yet.</p>
+      </div>
+      <div class="card">
+        <h4>Active Circles</h4>
+        <p>You haven't joined a savings circle yet.</p>
+        <a href="circles.html" class="btn btn-ghost">Browse circles &rarr;</a>
+      </div>
+      <div class="card">
+        <h4>Saved Listings</h4>
+        <p>You haven't saved any listings yet.</p>
+        <a href="directory.html" class="btn btn-ghost">View directory &rarr;</a>
+      </div>
+      <div class="card">
+        <h4>Watch Alerts</h4>
+        <p>Not following any topics yet.</p>
+        <a href="watch.html" class="btn btn-ghost">View archive &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h4 style="margin:0;">Messages</h4>
+        <a href="messages.html" class="btn btn-ghost">Open Messages &rarr;</a>
+      </div>
+      <div id="msgPreview" style="margin-top:14px; display:grid; gap:10px;"></div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <h4 style="margin:0;">People You May Know</h4>
+      </div>
+      <div class="grid grid-3" id="suggestionsGrid" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="card" style="margin-top:24px; text-align:center;">
+      <h4>Share your Official Black Card</h4>
+      <p>Know someone who carries the same spirit? Vouch for them — invite them in with your membership number.</p>
+      <a href="invite.html" class="btn btn-primary">Invite someone &rarr;</a>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center">
+    <p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  function initials(name) { return name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase(); }
+  const GRADIENTS = ["linear-gradient(135deg, var(--gold), var(--coral))", "linear-gradient(135deg, var(--emerald), var(--violet))", "linear-gradient(135deg, var(--coral), var(--violet))", "linear-gradient(135deg, var(--gold), var(--emerald))"];
+
+  (async () => {
+    const me = await obcRequireMember();
+    if (!me) return;
+
+    document.getElementById("pNumber").textContent = obcFormatMemberNumber(me.membership_number);
+    document.getElementById("pName").textContent = `${me.first_name} ${me.last_name}`;
+    document.getElementById("pAvatar").textContent = initials(`${me.first_name} ${me.last_name}`);
+    document.getElementById("pMeta").textContent = "Member since " + new Date(me.joined_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    document.getElementById("pBio").textContent = me.bio || "No bio yet.";
+
+    // ---- Messages preview: real conversations from the DB ----
+    const msgWrap = document.getElementById("msgPreview");
+    const { data: myParticipation } = await obcClient.from("obc_conversation_participants").select("conversation_id").eq("member_id", me.id);
+    if (!myParticipation || !myParticipation.length) {
+      msgWrap.innerHTML = `<p class="muted">No conversations yet — connect with someone below to start one.</p>`;
+    } else {
+      const previews = await Promise.all(myParticipation.slice(0, 3).map(async (p) => {
+        const [{ data: others }, { data: lastMsgs }] = await Promise.all([
+          obcClient.from("obc_conversation_participants").select("obc_members(first_name,last_name)").eq("conversation_id", p.conversation_id).neq("member_id", me.id),
+          obcClient.from("obc_messages").select("body,sender_id").eq("conversation_id", p.conversation_id).order("created_at", { ascending: false }).limit(1),
+        ]);
+        const other = others && others[0] ? others[0].obc_members : null;
+        const last = lastMsgs && lastMsgs[0];
+        return { name: other ? `${other.first_name} ${other.last_name}` : "Member", last };
+      }));
+      msgWrap.innerHTML = "";
+      previews.forEach(pv => {
+        const row = document.createElement("a");
+        row.href = "messages.html";
+        row.style.cssText = "display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;";
+        row.innerHTML = `
+          <div class="avatar sm" style="background:${GRADIENTS[0]};">${initials(pv.name)}</div>
+          <div style="flex:1; min-width:0;">
+            <strong style="font-size:.9rem;">${pv.name}</strong>
+            <div class="muted" style="font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${pv.last ? (pv.last.sender_id === me.id ? "You: " : "") + pv.last.body : ""}</div>
+          </div>
+        `;
+        msgWrap.appendChild(row);
+      });
+    }
+
+    // ---- People You May Know: real other members, minus who you're already connected to ----
+    const sugWrap = document.getElementById("suggestionsGrid");
+    const [{ data: others }, { data: myConnections }] = await Promise.all([
+      obcClient.from("obc_members").select("id,first_name,last_name,membership_number").neq("id", me.id).limit(12),
+      obcClient.from("obc_connections").select("connected_member_id").eq("member_id", me.id),
+    ]);
+    const connectedIds = new Set((myConnections || []).map(c => c.connected_member_id));
+    const suggestions = (others || []).filter(o => !connectedIds.has(o.id)).slice(0, 6);
+
+    if (!suggestions.length) {
+      sugWrap.innerHTML = `<p class="muted">No other members yet — <a href="invite.html" style="color:var(--gold-bright);">invite someone</a> to grow the community.</p>`;
+    } else {
+      sugWrap.innerHTML = "";
+      suggestions.forEach((s, i) => {
+        const name = `${s.first_name} ${s.last_name}`;
+        const card = document.createElement("div");
+        card.className = "suggestion-card";
+        card.innerHTML = `
+          <div class="avatar" style="background:${GRADIENTS[i % GRADIENTS.length]};">${initials(name)}</div>
+          <strong style="font-size:.92rem;">${name}</strong>
+          <div class="muted" style="font-size:.8rem; margin-bottom:10px;">${obcFormatMemberNumber(s.membership_number)}</div>
+          <button class="btn btn-primary" style="width:100%;">+ Connect</button>
+        `;
+        card.querySelector("button").addEventListener("click", async (e) => {
+          await obcClient.from("obc_connections").insert({ member_id: me.id, connected_member_id: s.id });
+          e.target.textContent = "✓ Connected";
+          e.target.classList.remove("btn-primary");
+          e.target.classList.add("btn-ghost");
+          e.target.disabled = true;
+        });
+        sugWrap.appendChild(card);
+      });
+    }
+  })();
+</script>
+</body>
+</html>

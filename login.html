@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Log In — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links"></div>
+    <a href="signup.html" class="btn btn-ghost">Not a member? Join</a>
+    <button class="nav-toggle" aria-label="Menu" style="visibility:hidden;">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:10px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Members Only</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Log in.</h1>
+    <p class="lead">Sign in with the email and password you joined with.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container" style="max-width:480px;">
+
+    <div id="loginStep" class="card">
+      <form id="loginForm" style="display:grid; gap:12px;">
+        <input required id="loginEmail" type="email" placeholder="Email" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <input required id="loginPassword" type="password" placeholder="Password" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <div id="loginError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Log In</button>
+      </form>
+    </div>
+
+    <div id="finishStep" class="card" style="display:none;">
+      <strong style="color:var(--gold-bright);">Almost there — finish setting up your membership.</strong>
+      <p style="margin:6px 0 14px;">Your email is confirmed. We just need a couple more details to issue your card.</p>
+      <form id="finishForm" style="display:grid; gap:12px;">
+        <div style="display:flex; gap:10px;">
+          <input required id="finishFirst" placeholder="First name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+          <input required id="finishLast" placeholder="Last name" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        </div>
+        <input id="finishReferral" placeholder="Membership number of the person who invited you (leave blank only if founding membership is unclaimed)" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <div id="finishError" style="display:none; color:var(--coral); font-size:.88rem;"></div>
+        <button type="submit" class="btn btn-primary">Finish Setup</button>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:20px; background:rgba(232,179,61,0.06); border-color:rgba(232,179,61,0.25);">
+      <strong style="color:var(--gold-bright);">First time here?</strong>
+      <p style="margin:6px 0 0;">If nobody has claimed the founding membership yet, <a href="signup.html" style="color:var(--gold-bright); text-decoration:underline;">sign up</a> and leave the referral field blank to claim it.</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  async function afterSignedIn() {
+    const member = await obcGetMyMember();
+    if (member) {
+      window.location.href = "profile.html";
+      return;
+    }
+    document.getElementById("loginStep").style.display = "none";
+    document.getElementById("finishStep").style.display = "block";
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.getElementById("loginError");
+    errorBox.style.display = "none";
+    const btn = document.getElementById("loginBtn");
+    btn.disabled = true;
+    btn.textContent = "Logging in...";
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const { error } = await obcClient.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false;
+    btn.textContent = "Log In";
+
+    if (error) {
+      errorBox.style.display = "block";
+      errorBox.textContent = error.message;
+      return;
+    }
+    await afterSignedIn();
+  });
+
+  document.getElementById("finishForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errorBox = document.getElementById("finishError");
+    errorBox.style.display = "none";
+
+    const firstName = document.getElementById("finishFirst").value.trim();
+    const lastName = document.getElementById("finishLast").value.trim();
+    const referral = document.getElementById("finishReferral").value.trim();
+    const session = await obcGetSession();
+
+    let result;
+    if (!referral) {
+      result = await obcClient.rpc("obc_founder_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email });
+    } else {
+      result = await obcClient.rpc("obc_signup", { p_first_name: firstName, p_last_name: lastName, p_email: session.user.email, p_referred_by: referral });
+    }
+
+    if (result.error) {
+      errorBox.style.display = "block";
+      errorBox.textContent = result.error.message.includes("INVALID_REFERRAL")
+        ? "We don't recognize that membership number."
+        : result.error.message;
+      return;
+    }
+    window.location.href = "profile.html";
+  });
+
+  // If they're already signed in (e.g. clicked back), skip straight to the right step.
+  (async () => {
+    const session = await obcGetSession();
+    if (session) await afterSignedIn();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Product — Back To Wallstreet Shoppe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
+      <a href="signup.html" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container" id="productRoot" style="max-width:1000px;">
+    <p class="muted">Loading product...</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head"><span class="kicker">More to love</span><h2>You may also like</h2></div>
+    <div class="grid grid-4" id="relatedGrid"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="data/shop.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const productId = params.get("id");
+  const product = getProductById(productId);
+  const root = document.getElementById("productRoot");
+
+  if (!product) {
+    root.innerHTML = `<p class="muted">Product not found. <a href="shop.html" style="color:var(--gold-bright);">Back to the Shoppe &rarr;</a></p>`;
+  } else {
+    const shop = getShopById(product.shopId);
+    const discount = product.originalPrice ? Math.round(100 - (product.price / product.originalPrice) * 100) : null;
+    root.innerHTML = `
+      <div class="grid grid-2">
+        <div class="product-thumb" style="background:${product.gradient}; border-radius:20px; font-size:5rem; aspect-ratio:1/1;">
+          &#128230;
+          ${discount ? `<span class="badge">-${discount}%</span>` : ""}
+        </div>
+        <div>
+          <h1 style="font-size:1.8rem;">${product.title}</h1>
+          <div class="stars" style="margin-bottom:6px;">${stars(product.rating)} <span class="muted">(${product.sold || 0} sold)</span></div>
+          <div class="price-row" style="margin-bottom:16px;">
+            <span class="price-now" style="font-size:1.6rem;">$${product.price.toFixed(2)}</span>
+            ${product.originalPrice ? `<span class="price-was">$${product.originalPrice.toFixed(2)}</span>` : ""}
+          </div>
+          <p>${product.desc || ""}</p>
+
+          ${product.variants ? `
+            <div style="margin:16px 0;">
+              <strong style="font-size:.9rem;">Options</strong><br/>
+              <div id="variantWrap" style="margin-top:8px;">
+                ${product.variants.map((v, i) => `<span class="variant-pill${i === 0 ? " active" : ""}" data-v="${v}">${v}</span>`).join("")}
+              </div>
+            </div>` : ""}
+
+          <div style="display:flex; align-items:center; gap:16px; margin:20px 0;">
+            <div class="qty-stepper">
+              <button onclick="changeQty(-1)">&minus;</button>
+              <span id="qtyDisplay">1</span>
+              <button onclick="changeQty(1)">+</button>
+            </div>
+            <span class="muted">${product.qty} in stock</span>
+          </div>
+
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn btn-ghost" onclick="doAddToCart()">Add to Cart</button>
+            <button class="btn btn-primary" onclick="doBuyNow()">Buy Now</button>
+          </div>
+
+          ${shop ? `
+          <a href="store.html?shop=${shop.id}" class="card" style="margin-top:24px; display:flex; align-items:center; gap:14px; text-decoration:none;">
+            <div class="avatar" style="background:${shop.gradient};">${shop.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase()}</div>
+            <div>
+              <strong>${shop.name}</strong>
+              <div class="stars" style="margin-top:2px;">${stars(shop.rating)} <span class="muted">(${shop.reviews} reviews)</span></div>
+            </div>
+          </a>` : ""}
+        </div>
+      </div>
+    `;
+
+    let qty = 1;
+    let selectedVariant = product.variants ? product.variants[0] : "";
+    window.changeQty = (d) => {
+      qty = Math.max(1, Math.min(product.qty, qty + d));
+      document.getElementById("qtyDisplay").textContent = qty;
+    };
+    const variantWrap = document.getElementById("variantWrap");
+    if (variantWrap) {
+      variantWrap.querySelectorAll(".variant-pill").forEach(el => {
+        el.addEventListener("click", () => {
+          variantWrap.querySelectorAll(".variant-pill").forEach(p => p.classList.remove("active"));
+          el.classList.add("active");
+          selectedVariant = el.dataset.v;
+        });
+      });
+    }
+    window.doAddToCart = () => {
+      addToCart(product.id, selectedVariant, qty);
+      alert(`Added ${qty} × ${product.title}${selectedVariant ? " (" + selectedVariant + ")" : ""} to your cart.`);
+    };
+    window.doBuyNow = () => {
+      addToCart(product.id, selectedVariant, qty);
+      location.href = "cart.html";
+    };
+
+    // Related: same category, excluding this product
+    const related = getAllProducts().filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+    const relGrid = document.getElementById("relatedGrid");
+    if (!related.length) { document.querySelector(".section-head").closest("section").style.display = "none"; }
+    related.forEach(p => {
+      const rShop = getShopById(p.shopId);
+      const card = document.createElement("a");
+      card.href = `product.html?id=${p.id}`;
+      card.className = "product-card";
+      card.style.textDecoration = "none";
+      card.innerHTML = `
+        <div class="product-thumb" style="background:${p.gradient};">&#128230;</div>
+        <div class="product-info">
+          <h4>${p.title}</h4>
+          <div class="price-row"><span class="price-now">$${p.price.toFixed(2)}</span></div>
+          <div class="shop-byline">${rShop ? rShop.name : ""}</div>
+        </div>`;
+      relGrid.appendChild(card);
+    });
+  }
+</script>
+</body>
+</html>

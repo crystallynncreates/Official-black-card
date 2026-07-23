@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Savings Circles — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
+      <a href="signup.html" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:20px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Susu &middot; Tanda &middot; Pardna</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Save together. Every round, someone wins.</h1>
+    <p class="lead">Form a friend savings group. Everyone puts in the same amount on the same schedule — each round, the full pot goes to one member, on rotation, until everyone's had their turn.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container">
+    <div class="card" style="border-color: rgba(0,196,140,0.35); background: linear-gradient(180deg, rgba(0,196,140,0.08), var(--panel-2));">
+      <span class="tag tag-emerald">How money moves</span>
+      <h3 style="margin-top:12px;">We track it. You send it. Directly.</h3>
+      <p>Official Black Card never touches or holds your money. We keep the group, the schedule, and the rotation order straight, and remind everyone when a payment is due — then hand off to <strong>Cash App</strong> or <strong>Zelle</strong> so members pay each other directly, peer-to-peer, the same way the app has always worked, just without the spreadsheet and the group text.</p>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:28px;">
+      <div class="card">
+        <h4>Your circle: "Sisters Building Wealth"</h4>
+        <p class="muted">6 members &middot; $100/week &middot; pot = $600/round</p>
+        <div style="margin:18px 0;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>This round's recipient</span><strong style="color:var(--gold-bright);">Denise R. ($Denise_R)</strong></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Payout method</span><span>Cash App</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>Contributions in</span><span>5 / 6</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Payout date</span><span>Fri, Jul 31</span></div>
+        </div>
+        <a href="#" class="btn btn-primary" onclick="event.preventDefault(); alert('Demo: this would deep-link out to Cash App to send your $100 contribution.');">Send my contribution &rarr;</a>
+      </div>
+
+      <div class="card">
+        <h4>Rotation order</h4>
+        <ol style="color:var(--cream-dim); padding-left:20px; line-height:2;">
+          <li>Angela T. &mdash; <span class="tag tag-emerald">Paid out</span></li>
+          <li>Marcus J. &mdash; <span class="tag tag-emerald">Paid out</span></li>
+          <li><strong style="color:var(--gold-bright);">Denise R. &mdash; This round</strong></li>
+          <li>Crystal N. &mdash; Round 4</li>
+          <li>Tyrell B. &mdash; Round 5</li>
+          <li>Nia W. &mdash; Round 6</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h4>Start a new circle</h4>
+      <form style="display:grid; gap:12px; max-width:480px;" onsubmit="event.preventDefault(); alert('Demo form — circle creation not yet wired to a backend.');">
+        <input required placeholder="Circle name" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--cream);" />
+        <div style="display:flex; gap:12px;">
+          <input required type="number" placeholder="Contribution amount ($)" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--cream);" />
+          <select style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--cream);">
+            <option>Weekly</option>
+            <option>Bi-weekly</option>
+            <option>Monthly</option>
+          </select>
+        </div>
+        <select style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--cream);">
+          <option>Payout via Cash App</option>
+          <option>Payout via Zelle</option>
+        </select>
+        <input placeholder="Invite members (emails or member #s, comma separated)" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--cream);" />
+        <button type="submit" class="btn btn-primary">Create Circle</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center">
+    <p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

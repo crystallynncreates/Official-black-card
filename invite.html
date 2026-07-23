@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Invite — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="profile.html">Profile</a>
+    </div>
+    <a href="profile.html" class="btn btn-ghost">Back to profile</a>
+    <button class="nav-toggle" aria-label="Menu" style="visibility:hidden;">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:10px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Grow it from within</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Invite someone in.</h1>
+    <p class="lead">You can vouch for anyone you trust. They'll need your membership number to join.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container" style="max-width:640px;">
+
+    <div class="card">
+      <div class="muted" style="font-size:.78rem; text-transform:uppercase;">Your membership number</div>
+      <div id="myNumber" style="font-family:var(--font-display); font-size:1.4rem; color:var(--gold-bright);">—</div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h3>Add people to invite</h3>
+      <p class="muted" style="font-size:.88rem;">Pull names from your phone's contacts (supported on some mobile browsers), or add them by hand.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin:14px 0;">
+        <button id="contactsBtn" class="btn btn-primary">&#128222; Choose from Contacts</button>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <input id="manualAdd" placeholder="Name or phone number" style="flex:1;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        <button id="manualAddBtn" class="btn btn-ghost">Add</button>
+      </div>
+      <div id="recipientChips" class="filters" style="margin-top:14px;"></div>
+      <p id="contactsNote" class="muted" style="font-size:.78rem; margin-top:10px;"></p>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h3>Your message</h3>
+      <textarea id="messageBox" rows="4" style="width:100%; box-sizing:border-box; padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream); font-family:inherit; margin-top:8px;"></textarea>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px;">
+        <button id="shareBtn" class="btn btn-primary">&#8599; Share</button>
+        <a id="smsLink" href="#" class="btn btn-ghost">&#128172; Text it</a>
+        <button id="copyBtn" class="btn btn-ghost">&#128203; Copy message</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  let recipients = [];
+  const messageBox = document.getElementById("messageBox");
+
+  (async () => {
+    const me = await obcRequireMember();
+    if (!me) return;
+    document.getElementById("myNumber").textContent = obcFormatMemberNumber(me.membership_number);
+    messageBox.value = `You've been personally invited to join Official Black Card — a private, invitation-only space built to grow the bonds of the Black community from within. Use my membership number ${obcFormatMemberNumber(me.membership_number)} when you sign up, and I'll see you inside.`;
+  })();
+  function renderChips() {
+    const wrap = document.getElementById("recipientChips");
+    wrap.innerHTML = "";
+    recipients.forEach((r, i) => {
+      const chip = document.createElement("span");
+      chip.className = "chip active";
+      chip.style.cursor = "pointer";
+      chip.textContent = r + " ✕";
+      chip.onclick = () => { recipients.splice(i, 1); renderChips(); };
+      wrap.appendChild(chip);
+    });
+  }
+
+  document.getElementById("manualAddBtn").addEventListener("click", () => {
+    const input = document.getElementById("manualAdd");
+    if (input.value.trim()) { recipients.push(input.value.trim()); input.value = ""; renderChips(); }
+  });
+
+  const note = document.getElementById("contactsNote");
+  document.getElementById("contactsBtn").addEventListener("click", async () => {
+    if ("contacts" in navigator && "ContactsManager" in window) {
+      try {
+        const props = ["name", "tel"];
+        const opts = { multiple: true };
+        const contacts = await navigator.contacts.select(props, opts);
+        contacts.forEach(c => recipients.push((c.name && c.name[0]) || (c.tel && c.tel[0]) || "Contact"));
+        renderChips();
+      } catch (err) {
+        note.textContent = "Contact picker was cancelled or unavailable.";
+      }
+    } else {
+      note.textContent = "Your browser doesn't support picking contacts directly (this API currently only works on some Android mobile browsers over HTTPS). Add names manually above, or just use Share/Text below.";
+    }
+  });
+
+  document.getElementById("shareBtn").addEventListener("click", async () => {
+    if (navigator.share) {
+      try { await navigator.share({ title: "Join Official Black Card", text: messageBox.value }); }
+      catch (err) { /* user cancelled */ }
+    } else {
+      alert("Web Share isn't supported in this browser. Use Copy Message or Text It instead.");
+    }
+  });
+
+  document.getElementById("smsLink").addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = `sms:?&body=${encodeURIComponent(messageBox.value)}`;
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(messageBox.value);
+      const btn = document.getElementById("copyBtn");
+      const original = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    } catch (err) {
+      alert("Couldn't copy automatically — select and copy the text manually.");
+    }
+  });
+</script>
+</body>
+</html>

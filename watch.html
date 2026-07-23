@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Watch — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
+      <a href="signup.html" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:20px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Updated daily &middot; Sourced &middot; Archived</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Prison &amp; Government Watch</h1>
+    <p class="lead">We check the record daily — prison systems, sentencing, and government policy — and translate it into plain language, always tied back to what it means for the Black community, always with the source linked.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container">
+    <div class="grid" id="articleGrid" style="gap:24px;"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center">
+    <p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p>
+  </div>
+</footer>
+
+<script src="data/watch.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const grid = document.getElementById("articleGrid");
+  WATCH_ARTICLES.forEach(a => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+        <span class="muted" style="font-size:.85rem;">${a.date}</span>
+        <div>${a.tags.map(t => `<span class="tag tag-violet" style="margin-left:6px;">${t}</span>`).join("")}</div>
+      </div>
+      <h3>${a.title}</h3>
+      <p>${a.overview}</p>
+      <div class="card" style="background:rgba(0,196,140,0.06); border-color:rgba(0,196,140,0.25); margin:14px 0;">
+        <strong style="color:var(--emerald);">Why this matters to us</strong>
+        <p style="margin:6px 0 0;">${a.relevance}</p>
+      </div>
+      <a href="${a.sourceUrl}" target="_blank" rel="noopener" class="btn btn-ghost">Source: ${a.source} &rarr;</a>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+</body>
+</html>

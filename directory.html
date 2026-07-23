@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Directory — Official Black Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">OBC</span> Official Black Card</a>
+    <div class="nav-links">
+      <a href="directory.html">Directory</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="shop.html">Shoppe</a>
+      <a href="homeschool.html">Homeschool</a>
+      <a href="community.html">Community</a>
+      <a href="circles.html">Circles</a>
+      <a href="watch.html">Watch</a>
+      <a href="reels.html">Reels</a>
+      <a href="prayer.html">Prayer Corner</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="messages.html" class="cart-link">&#128172;<span id="msgCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="cart.html" class="cart-link">&#128722;<span id="cartCount" class="cart-badge" style="display:none;">0</span></a>
+      <a href="login.html" class="btn btn-ghost" style="padding:9px 16px; font-size:.85rem;">Log In</a>
+      <a href="signup.html" class="nav-cta">Join</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:20px;">
+  <div class="container">
+    <span class="eyebrow">&#9679; Nationwide Directory</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Find Black-owned everything.</h1>
+    <p class="lead">Businesses, banks, farms, doctors, and organizations — every city, every state. Search below, or jump straight to the biggest directories we pull from.</p>
+  </div>
+</header>
+
+<section class="section" style="padding-top:10px;">
+  <div class="container">
+    <div class="search-bar">
+      <select id="stateFilter" class="sb-state"><option value="">State</option></select>
+      <input id="cityFilter" class="sb-city" type="text" placeholder="City" />
+      <input id="zipFilter" class="sb-zip" type="text" inputmode="numeric" placeholder="Zip code" />
+      <button class="btn btn-primary" onclick="renderListings()">Search</button>
+    </div>
+
+    <div class="filters" id="categoryChips"></div>
+
+    <h3 style="margin-top:36px;">Sample listings</h3>
+    <p class="muted">Demo data — the live directory ingests from partner sources below plus verified member submissions, covering every U.S. city and state.</p>
+    <div class="grid grid-3" id="listingsGrid"></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">Partner &amp; Source Directories</span>
+      <h2>Where this data comes from</h2>
+      <p>We aggregate and link out to the largest existing Black-owned business directories rather than reinventing them — plus verified member submissions to fill any gaps.</p>
+    </div>
+    <div class="grid grid-3" id="partnerGrid"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container center">
+    <p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p>
+  </div>
+</footer>
+
+<script src="data/directories.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"];
+  const stateSelect = document.getElementById("stateFilter");
+  US_STATES.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s; opt.textContent = s;
+    stateSelect.appendChild(opt);
+  });
+
+  let activeCategory = "All";
+  const chipWrap = document.getElementById("categoryChips");
+  CATEGORIES.forEach(cat => {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (cat === "All" ? " active" : "");
+    chip.textContent = cat;
+    chip.onclick = () => {
+      activeCategory = cat;
+      [...chipWrap.children].forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      renderListings();
+    };
+    chipWrap.appendChild(chip);
+  });
+
+  function renderListings() {
+    const city = document.getElementById("cityFilter").value.toLowerCase().trim();
+    const zip = document.getElementById("zipFilter").value.trim();
+    const state = stateSelect.value;
+    const grid = document.getElementById("listingsGrid");
+    grid.innerHTML = "";
+    const filtered = LISTINGS.filter(l => {
+      const matchesCat = activeCategory === "All" || l.category === activeCategory;
+      const matchesState = !state || l.state === state || l.state === "All 50";
+      const matchesCity = !city || l.city.toLowerCase().includes(city);
+      const matchesZip = !zip || l.zip.startsWith(zip);
+      return matchesCat && matchesState && matchesCity && matchesZip;
+    });
+    if (!filtered.length) {
+      grid.innerHTML = `<p class="muted">No matches yet in the demo dataset — try clearing filters.</p>`;
+      return;
+    }
+    filtered.forEach(l => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <span class="tag tag-emerald">${l.category}</span>
+        <h3 style="margin-top:10px;">${l.name}</h3>
+        <p>${l.desc}</p>
+        <p class="muted">${l.city}, ${l.state}</p>
+        <a href="${l.url}" target="_blank" rel="noopener" class="btn btn-ghost">Visit &rarr;</a>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  const partnerGrid = document.getElementById("partnerGrid");
+  PARTNER_SOURCES.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <span class="tag tag-gold">${p.category}</span>
+      <h3 style="margin-top:10px;">${p.name}</h3>
+      <p>${p.note}</p>
+      <a href="${p.url}" target="_blank" rel="noopener" class="btn btn-ghost">Visit site &rarr;</a>
+    `;
+    partnerGrid.appendChild(card);
+  });
+
+  renderListings();
+</script>
+</body>
+</html>
