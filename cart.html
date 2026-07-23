@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cart — Back To Wallstreet Shoppe</title>
+<title>Cart — Wallstreet Shoppee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css" />
@@ -52,8 +52,9 @@
   <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
-<script src="data/shop.js"></script>
-<script src="js/shop.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/shop-supabase.js"></script>
 <script src="js/app.js"></script>
 <script>
   function render() {
@@ -67,11 +68,11 @@
       <div class="card">
         ${lines.map(l => `
           <div class="cart-line">
-            <div class="thumb" style="background:${l.product.gradient};">&#128230;</div>
+            <div class="thumb" style="${l.product.image_url ? "" : "background:linear-gradient(160deg, var(--gold), var(--coral));"}">${l.product.image_url ? `<img src="${l.product.image_url}" alt="${l.product.title}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />` : "&#128230;"}</div>
             <div class="grow">
               <strong>${l.product.title}</strong>
               ${l.variant ? `<div class="muted" style="font-size:.85rem;">${l.variant}</div>` : ""}
-              <div class="price-now" style="margin-top:4px;">$${l.product.price.toFixed(2)}</div>
+              <div class="price-now" style="margin-top:4px;">$${Number(l.product.price).toFixed(2)}</div>
             </div>
             <div class="qty-stepper">
               <button onclick="changeLine('${l.productId}','${l.variant}',${l.qty - 1})">&minus;</button>

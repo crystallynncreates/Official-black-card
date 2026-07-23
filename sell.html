@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Start Selling — Back To Wallstreet Shoppe</title>
+<title>Start Selling — Wallstreet Shoppee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css" />
@@ -39,7 +39,7 @@
   <div class="container">
     <span class="eyebrow">&#9679; Sell on the Shoppe</span>
     <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Turn your hustle into a storefront.</h1>
-    <p class="lead">Set up your shop, list your first product, and start selling to the community — payment comes straight to your own Cash App or Zelle, no waiting on a payout schedule.</p>
+    <p class="lead">Set up your shop with a real photo, list your first product, and start selling to the community.</p>
   </div>
 </header>
 
@@ -49,8 +49,14 @@
       <h3>Create your shop</h3>
       <form id="shopForm" style="display:grid; gap:12px; margin-top:12px;">
         <input required id="shopName" placeholder="Shop name" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
-        <select id="shopCategory" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);"></select>
+        <select id="shopCategory" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);">
+          <option>Beauty</option><option>Fashion</option><option>Food</option><option>Home</option><option>Home & Garden</option><option>Art & Home</option><option>Other</option>
+        </select>
         <textarea id="shopBio" required placeholder="Short shop bio (what do you sell?)" rows="2" style="padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream); font-family:inherit;"></textarea>
+        <div>
+          <label class="muted" style="font-size:.82rem;">Shop photo/logo</label><br/>
+          <input id="shopLogo" type="file" accept="image/*" style="margin-top:6px;" />
+        </div>
         <div style="display:flex; gap:10px;">
           <select id="payoutMethod" style="flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);">
             <option>Cash App</option>
@@ -58,7 +64,7 @@
           </select>
           <input required id="payoutHandle" placeholder="Your $cashtag or Zelle email/phone" style="flex:2;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
         </div>
-        <button type="submit" class="btn btn-primary">Create Shop</button>
+        <button type="submit" class="btn btn-primary" id="shopSubmitBtn">Create Shop</button>
       </form>
     </div>
 
@@ -70,45 +76,66 @@
   <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
-<script src="data/shop.js"></script>
-<script src="js/shop.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/shop-supabase.js"></script>
 <script src="js/app.js"></script>
 <script>
-  SHOP_CATEGORIES.filter(c => c !== "All").forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c; opt.textContent = c;
-    document.getElementById("shopCategory").appendChild(opt);
-  });
+  function initials(name) { return name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase(); }
+  let me = null;
 
-  document.getElementById("shopForm").addEventListener("submit", (e) => {
+  document.getElementById("shopForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    createShop({
+    if (!me) return;
+    const btn = document.getElementById("shopSubmitBtn");
+    btn.disabled = true; btn.textContent = "Creating...";
+
+    let logoUrl = null;
+    const file = document.getElementById("shopLogo").files[0];
+    if (file) {
+      try { logoUrl = await uploadObcImage(file, me.id); }
+      catch (err) { alert("Photo upload failed: " + err.message); }
+    }
+
+    const { error } = await createMemberShop({
       name: document.getElementById("shopName").value,
       category: document.getElementById("shopCategory").value,
       bio: document.getElementById("shopBio").value,
       payoutMethod: document.getElementById("payoutMethod").value,
       payoutHandle: document.getElementById("payoutHandle").value,
+      ownerId: me.id,
     });
+    if (!error && logoUrl) {
+      const shops = await getMemberShops();
+      const mine = shops.find(s => s.owner_id === me.id);
+      if (mine) await obcClient.from("obc_shops").update({ logo_url: logoUrl }).eq("id", mine.id);
+    }
+
+    btn.disabled = false; btn.textContent = "Create Shop";
+    if (error) { alert(error.message); return; }
     e.target.reset();
     renderMyShops();
   });
 
-  function initials(name) { return name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase(); }
-
-  function renderMyShops() {
-    const shops = getMyShops();
+  async function renderMyShops() {
+    const allShops = await getMemberShops();
+    const myShops = allShops.filter(s => s.owner_id === me.id);
     const wrap = document.getElementById("myShops");
-    if (!shops.length) { wrap.innerHTML = ""; return; }
-    wrap.innerHTML = shops.map(s => {
-      const products = getProductsByShop(s.id);
-      const orders = getOrdersForShop(s.id);
-      return `
-      <div class="card" style="margin-top:24px;">
+    if (!myShops.length) { wrap.innerHTML = ""; return; }
+
+    wrap.innerHTML = "";
+    for (const s of myShops) {
+      const products = await getMemberProductsByShop(s.id);
+      const orders = await getOrderItemsForShop(s.id);
+      const section = document.createElement("div");
+      section.className = "card";
+      section.style.marginTop = "24px";
+      section.innerHTML = `
         <div style="display:flex; align-items:center; gap:14px;">
-          <div class="avatar" style="background:${s.gradient};">${initials(s.name)}</div>
+          ${s.logo_url ? `<img src="${s.logo_url}" alt="${s.name}" class="avatar" style="object-fit:cover;" />` : `<div class="avatar">${initials(s.name)}</div>`}
           <div style="flex:1;">
             <strong>${s.name}</strong>
-            <div class="muted" style="font-size:.85rem;">${s.category} &middot; payout via ${s.payoutMethod} (${s.payoutHandle})</div>
+            <div class="muted" style="font-size:.85rem;">${s.category} &middot; payout via ${s.payout_method} (${s.payout_handle})</div>
           </div>
           <a href="store.html?shop=${s.id}" class="btn btn-ghost">View storefront &rarr;</a>
         </div>
@@ -123,6 +150,10 @@
             <input name="qty" type="number" placeholder="Qty in stock" style="flex:1;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
           </div>
           <input name="variants" placeholder="Options, comma separated (e.g. Small, Medium, Large) — optional" style="padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+          <div>
+            <label class="muted" style="font-size:.82rem;">Product photo</label><br/>
+            <input type="file" accept="image/*" name="photo" style="margin-top:6px;" />
+          </div>
           <button type="submit" class="btn btn-primary" style="justify-self:start;">Add Product</button>
         </form>
 
@@ -130,8 +161,8 @@
         <div class="grid grid-3" style="margin-top:10px;">
           ${products.map(p => `
             <div class="product-card">
-              <div class="product-thumb" style="background:${p.gradient};">&#128230;</div>
-              <div class="product-info"><h4>${p.title}</h4><div class="price-now">$${p.price.toFixed(2)}</div></div>
+              <div class="product-thumb" style="${p.image_url ? "" : "background:linear-gradient(160deg, var(--gold), var(--coral));"}">${p.image_url ? `<img src="${p.image_url}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;" />` : "&#128230;"}</div>
+              <div class="product-info"><h4>${p.title}</h4><div class="price-now">$${Number(p.price).toFixed(2)}</div></div>
             </div>
           `).join("") || `<p class="muted">No products listed yet.</p>`}
         </div>
@@ -141,33 +172,47 @@
           <div class="card" style="margin-top:10px;">
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
               <div>
-                <strong>Order #${o.orderId}</strong>
-                <div class="muted" style="font-size:.85rem;">${o.items.map(i => `${i.qty} × ${i.title}`).join(", ")}</div>
-                <div class="muted" style="font-size:.85rem;">Ship to: ${o.shippingInfo.name}, ${o.shippingInfo.city}, ${o.shippingInfo.state} ${o.shippingInfo.zip}</div>
+                <strong>${o.qty} × ${o.title}</strong>${o.variant ? ` (${o.variant})` : ""}
+                <div class="muted" style="font-size:.85rem;">Ship to: ${o.obc_orders.shipping_info.name}, ${o.obc_orders.shipping_info.city}, ${o.obc_orders.shipping_info.state} ${o.obc_orders.shipping_info.zip}</div>
               </div>
               <div style="text-align:right;">
                 <span class="tag tag-gold">${o.status}</span><br/>
-                <button class="btn btn-ghost" style="margin-top:8px;" onclick="advanceOrder('${o.orderId}','${s.id}')">Advance status &rarr;</button>
+                <button class="btn btn-ghost" style="margin-top:8px;" onclick="advanceOrder('${o.id}','${o.status}')">Advance status &rarr;</button>
               </div>
             </div>
           </div>
         `).join("") : `<p class="muted">No orders yet.</p>`}
-      </div>`;
-    }).join("");
+      `;
+      wrap.appendChild(section);
+    }
 
     wrap.querySelectorAll(".add-product-form").forEach(form => {
-      form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
-        createProduct({
+        const submitBtn = form.querySelector("button[type=submit]");
+        submitBtn.disabled = true; submitBtn.textContent = "Adding...";
+
+        let imageUrl = null;
+        const file = fd.get("photo");
+        if (file && file.size > 0) {
+          try { imageUrl = await uploadObcImage(file, me.id); }
+          catch (err) { alert("Photo upload failed: " + err.message); }
+        }
+
+        const shopsNow = await getMemberShops();
+        const shopRecord = shopsNow.find(s => s.id === form.dataset.shop);
+
+        await createMemberProduct({
           shopId: form.dataset.shop,
           title: fd.get("title"),
-          desc: fd.get("desc"),
+          description: fd.get("desc"),
           price: fd.get("price"),
           originalPrice: fd.get("originalPrice") || null,
           qty: fd.get("qty") || 1,
-          category: getShopById(form.dataset.shop).category,
+          category: shopRecord ? shopRecord.category : "Other",
           variants: fd.get("variants") ? fd.get("variants").split(",").map(v => v.trim()).filter(Boolean) : null,
+          imageUrl,
         });
         renderMyShops();
       });
@@ -175,16 +220,18 @@
   }
 
   const STATUS_FLOW = ["Paid — Processing", "Shipped", "Delivered"];
-  function advanceOrder(orderId, shopId) {
-    const orders = getOrdersForShop(shopId);
-    const o = orders.find(x => x.orderId === orderId);
-    const idx = STATUS_FLOW.indexOf(o.status);
+  async function advanceOrder(orderItemId, currentStatus) {
+    const idx = STATUS_FLOW.indexOf(currentStatus);
     const next = STATUS_FLOW[Math.min(idx + 1, STATUS_FLOW.length - 1)];
-    setSubOrderStatus(orderId, shopId, next);
+    await setOrderItemStatus(orderItemId, next);
     renderMyShops();
   }
 
-  renderMyShops();
+  (async () => {
+    me = await obcRequireMember();
+    if (!me) return;
+    renderMyShops();
+  })();
 </script>
 </body>
 </html>

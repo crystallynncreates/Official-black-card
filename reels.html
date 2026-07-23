@@ -37,20 +37,30 @@
 
 <header class="hero" style="padding-bottom:16px;">
   <div class="container">
-    <span class="eyebrow">&#9679; Vlogs &middot; short-form video</span>
+    <span class="eyebrow">&#9679; Made by members</span>
     <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Reels</h1>
-    <p class="lead">Post and watch short-form video from the community — everyday life, know-your-rights breakdowns, wins to celebrate, and everything in between.</p>
+    <p class="lead">Real posts from real Official Black Card members — everyday life, know-your-rights breakdowns, wins to celebrate, and everything in between.</p>
   </div>
 </header>
 
 <section class="section" style="padding-top:10px;">
   <div class="container">
-    <div class="card" style="margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
-      <div class="post-head" style="margin:0;">
-        <div class="avatar">You</div>
-        <div class="who"><strong>Share a reel</strong><span>Video upload not wired to a backend yet — demo only</span></div>
+    <div class="card" style="margin-bottom:24px;">
+      <div class="post-head" style="margin-bottom:12px;">
+        <div class="avatar" id="composerAvatar">You</div>
+        <div class="who"><strong id="composerName">Share a reel</strong><span>Visible to all members</span></div>
       </div>
-      <button class="btn btn-primary" onclick="alert('Demo: this would open the camera/upload flow once video storage is connected.');">+ New Reel</button>
+      <form id="reelForm" style="display:grid; gap:10px;">
+        <textarea id="reelCaption" required placeholder="What's this reel about?" rows="2" style="padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream); font-family:inherit;"></textarea>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <div>
+            <label class="muted" style="font-size:.82rem;">Photo</label><br/>
+            <input id="reelPhoto" type="file" accept="image/*" style="margin-top:6px;" />
+          </div>
+          <input id="reelVideoUrl" placeholder="Or paste a video link (YouTube, etc.) — optional" style="flex:1; min-width:220px; padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--cream);" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-self:start;" id="reelSubmitBtn">+ Post Reel</button>
+      </form>
     </div>
 
     <div class="grid grid-3" id="reelsGrid"></div>
@@ -61,34 +71,151 @@
   <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
-<script src="data/reels.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/shop-supabase.js"></script>
 <script src="js/app.js"></script>
 <script>
   function initials(name) { return name.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase(); }
+  const GRADIENTS = ["linear-gradient(160deg, var(--gold), var(--coral))", "linear-gradient(160deg, var(--emerald), var(--violet))", "linear-gradient(160deg, var(--coral), var(--violet))", "linear-gradient(160deg, var(--gold), var(--emerald))"];
 
-  const grid = document.getElementById("reelsGrid");
-  REELS.forEach((r, i) => {
-    const card = document.createElement("div");
-    card.className = "reel-card";
-    card.innerHTML = `
-      <div class="reel-thumb" style="background:${r.gradient};">
-        <div class="play">&#9654;</div>
-      </div>
-      <div class="reel-body">
-        <div class="post-head" style="margin-bottom:8px;">
-          <div class="avatar sm${r.avatarAlt ? " alt" : ""}">${initials(r.creator)}</div>
-          <div class="who"><strong>${r.creator}</strong></div>
+  let me = null;
+
+  async function loadReels() {
+    const { data, error } = await obcClient
+      .from("obc_reels")
+      .select("id,caption,photo_url,video_url,created_at,member_id,obc_members(first_name,last_name)")
+      .order("created_at", { ascending: false });
+    if (error) { console.error(error); return []; }
+    return data;
+  }
+
+  function youtubeEmbed(url) {
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+    return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+  }
+
+  async function renderReels() {
+    const reels = await loadReels();
+    const grid = document.getElementById("reelsGrid");
+    if (!reels.length) {
+      grid.innerHTML = `<p class="muted">No reels yet — be the first Official Black Card member to post one.</p>`;
+      return;
+    }
+    const [{ data: likeRows }, { data: commentRows }] = await Promise.all([
+      obcClient.from("obc_reel_likes").select("reel_id,member_id"),
+      obcClient.from("obc_reel_comments").select("id,reel_id,body,member_id,obc_members(first_name,last_name)").order("created_at", { ascending: true }),
+    ]);
+
+    grid.innerHTML = "";
+    reels.forEach((r, i) => {
+      const name = r.obc_members ? `${r.obc_members.first_name} ${r.obc_members.last_name}` : "Member";
+      const likes = (likeRows || []).filter(l => l.reel_id === r.id);
+      const iLiked = me && likes.some(l => l.member_id === me.id);
+      const comments = (commentRows || []).filter(c => c.reel_id === r.id);
+      const embed = r.video_url ? youtubeEmbed(r.video_url) : null;
+
+      const card = document.createElement("div");
+      card.className = "reel-card";
+      let mediaHtml;
+      if (embed) {
+        mediaHtml = `<div class="reel-thumb" style="padding:0;"><iframe src="${embed}" style="width:100%; height:100%; border:0;" allowfullscreen></iframe></div>`;
+      } else if (r.photo_url) {
+        mediaHtml = `<div class="reel-thumb" style="padding:0;"><img src="${r.photo_url}" alt="" style="width:100%; height:100%; object-fit:cover;" /></div>`;
+      } else {
+        mediaHtml = `<div class="reel-thumb" style="background:${GRADIENTS[i % GRADIENTS.length]};"><div class="play">&#9654;</div></div>`;
+      }
+      card.innerHTML = `
+        ${mediaHtml}
+        <div class="reel-body">
+          <div class="post-head" style="margin-bottom:8px;">
+            <div class="avatar sm">${initials(name)}</div>
+            <div class="who"><strong>${name}</strong></div>
+          </div>
+          <p style="margin:0 0 4px; color:var(--cream); font-size:.92rem;">${r.caption}</p>
+          <div class="action-row">
+            <button class="action-btn${iLiked ? " active" : ""}" data-like="${r.id}">&#10084;&#65039; ${likes.length}</button>
+            <button class="action-btn" data-toggle-comments="${r.id}">&#128172; ${comments.length}</button>
+          </div>
+          <div class="replies" id="comments-${r.id}" style="display:none;">
+            ${comments.map(c => `<div style="font-size:.85rem;"><strong>${c.obc_members ? c.obc_members.first_name : "Member"}</strong> ${c.body}</div>`).join("") || `<p class="muted" style="font-size:.85rem;">No comments yet.</p>`}
+          </div>
+          <div class="reply-form" id="commentForm-${r.id}" style="display:none;">
+            <input placeholder="Write a comment..." id="commentInput-${r.id}" />
+            <button data-send-comment="${r.id}">Send</button>
+          </div>
         </div>
-        <p style="margin:0 0 4px; color:var(--cream); font-size:.92rem;">${r.caption}</p>
-        <div class="action-row">
-          <button class="action-btn">&#10084;&#65039; ${r.likes}</button>
-          <button class="action-btn">&#128172; ${r.comments}</button>
-          <button class="action-btn">&#8599; Share</button>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
+      `;
+      grid.appendChild(card);
+    });
+
+    grid.querySelectorAll("[data-like]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!me) { window.location.href = "login.html"; return; }
+        const reelId = btn.dataset.like;
+        if (btn.classList.contains("active")) {
+          await obcClient.from("obc_reel_likes").delete().eq("reel_id", reelId).eq("member_id", me.id);
+        } else {
+          await obcClient.from("obc_reel_likes").insert({ reel_id: reelId, member_id: me.id });
+        }
+        renderReels();
+      });
+    });
+    grid.querySelectorAll("[data-toggle-comments]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.toggleComments;
+        document.getElementById(`comments-${id}`).style.display = "block";
+        const form = document.getElementById(`commentForm-${id}`);
+        form.style.display = form.style.display === "none" ? "flex" : "none";
+      });
+    });
+    grid.querySelectorAll("[data-send-comment]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!me) { window.location.href = "login.html"; return; }
+        const id = btn.dataset.sendComment;
+        const input = document.getElementById(`commentInput-${id}`);
+        if (!input.value.trim()) return;
+        await obcClient.from("obc_reel_comments").insert({ reel_id: id, member_id: me.id, body: input.value.trim() });
+        renderReels();
+      });
+    });
+  }
+
+  document.getElementById("reelForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!me) { window.location.href = "login.html"; return; }
+    const btn = document.getElementById("reelSubmitBtn");
+    btn.disabled = true; btn.textContent = "Posting...";
+
+    let photoUrl = null;
+    const file = document.getElementById("reelPhoto").files[0];
+    if (file) {
+      try { photoUrl = await uploadObcImage(file, me.id); }
+      catch (err) { alert("Photo upload failed: " + err.message); }
+    }
+
+    await obcClient.from("obc_reels").insert({
+      member_id: me.id,
+      caption: document.getElementById("reelCaption").value.trim(),
+      photo_url: photoUrl,
+      video_url: document.getElementById("reelVideoUrl").value.trim() || null,
+    });
+
+    btn.disabled = false; btn.textContent = "+ Post Reel";
+    e.target.reset();
+    renderReels();
   });
+
+  (async () => {
+    me = await obcGetMyMember();
+    if (me) {
+      document.getElementById("composerAvatar").textContent = initials(`${me.first_name} ${me.last_name}`);
+      document.getElementById("composerName").textContent = `Post as ${me.first_name}`;
+    } else {
+      document.getElementById("composerName").innerHTML = `<a href="login.html" style="color:var(--gold-bright);">Log in</a> to post a reel`;
+    }
+    renderReels();
+  })();
 </script>
 </body>
 </html>

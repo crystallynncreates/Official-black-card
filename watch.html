@@ -37,16 +37,14 @@
 
 <header class="hero" style="padding-bottom:20px;">
   <div class="container">
-    <span class="eyebrow">&#9679; Updated daily &middot; Sourced &middot; Archived</span>
+    <span class="eyebrow">&#9679; Checked daily &middot; Sourced &middot; Archived</span>
     <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Prison &amp; Government Watch</h1>
-    <p class="lead">We check the record daily — prison systems, sentencing, and government policy — and translate it into plain language, always tied back to what it means for the Black community, always with the source linked.</p>
+    <p class="lead">We check the record daily — prison systems, sentencing, and government policy — and translate it into plain language, always tied back to what it means for the Black community, always with the source linked. Grouped by day, up to 3 stories at a time — including real broadcast footage where it exists.</p>
   </div>
 </header>
 
 <section class="section" style="padding-top:10px;">
-  <div class="container">
-    <div class="grid" id="articleGrid" style="gap:24px;"></div>
-  </div>
+  <div class="container" id="dayGroups"></div>
 </section>
 
 <footer class="footer">
@@ -58,24 +56,48 @@
 <script src="data/watch.js"></script>
 <script src="js/app.js"></script>
 <script>
-  const grid = document.getElementById("articleGrid");
-  WATCH_ARTICLES.forEach(a => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-        <span class="muted" style="font-size:.85rem;">${a.date}</span>
-        <div>${a.tags.map(t => `<span class="tag tag-violet" style="margin-left:6px;">${t}</span>`).join("")}</div>
+  const byDate = {};
+  WATCH_ARTICLES.forEach(a => { (byDate[a.date] = byDate[a.date] || []).push(a); });
+  const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+  const wrap = document.getElementById("dayGroups");
+  dates.forEach(date => {
+    const dayLabel = new Date(date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    const section = document.createElement("div");
+    section.style.marginBottom = "36px";
+    section.innerHTML = `
+      <div class="section-head" style="margin-left:0; margin-bottom:16px;">
+        <span class="kicker">${dayLabel}</span>
+        <h2 style="font-size:1.3rem;">${byDate[date].length} stor${byDate[date].length === 1 ? "y" : "ies"} checked</h2>
       </div>
-      <h3>${a.title}</h3>
-      <p>${a.overview}</p>
-      <div class="card" style="background:rgba(0,196,140,0.06); border-color:rgba(0,196,140,0.25); margin:14px 0;">
-        <strong style="color:var(--emerald);">Why this matters to us</strong>
-        <p style="margin:6px 0 0;">${a.relevance}</p>
-      </div>
-      <a href="${a.sourceUrl}" target="_blank" rel="noopener" class="btn btn-ghost">Source: ${a.source} &rarr;</a>
+      <div class="grid" style="gap:20px;" id="grid-${date}"></div>
     `;
-    grid.appendChild(card);
+    wrap.appendChild(section);
+    const grid = section.querySelector(`#grid-${date}`);
+
+    byDate[date].forEach(a => {
+      const card = document.createElement("div");
+      card.className = "card";
+      const isBroadcast = a.type === "broadcast";
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+          ${isBroadcast ? `<span class="tag tag-coral">&#127909; Broadcast Footage</span>` : `<span class="muted" style="font-size:.85rem;">Article</span>`}
+          <div>${a.tags.map(t => `<span class="tag tag-violet" style="margin-left:6px;">${t}</span>`).join("")}</div>
+        </div>
+        ${isBroadcast ? `
+          <a href="${a.sourceUrl}" target="_blank" rel="noopener" class="reel-thumb" style="display:flex; border-radius:14px; margin-bottom:14px; background:linear-gradient(160deg, var(--coral), var(--violet)); text-decoration:none;">
+            <div class="play">&#9654;</div>
+          </a>` : ""}
+        <h3>${a.title}</h3>
+        <p>${a.overview}</p>
+        <div class="card" style="background:rgba(0,196,140,0.06); border-color:rgba(0,196,140,0.25); margin:14px 0;">
+          <strong style="color:var(--emerald);">Why this matters to us</strong>
+          <p style="margin:6px 0 0;">${a.relevance}</p>
+        </div>
+        <a href="${a.sourceUrl}" target="_blank" rel="noopener" class="btn btn-ghost">${isBroadcast ? "Watch" : "Source"}: ${a.source} &rarr;</a>
+      `;
+      grid.appendChild(card);
+    });
   });
 </script>
 </body>

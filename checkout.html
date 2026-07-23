@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Checkout — Back To Wallstreet Shoppe</title>
+<title>Checkout — Wallstreet Shoppee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css" />
@@ -63,14 +63,18 @@
   <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
 </footer>
 
-<script src="data/shop.js"></script>
-<script src="js/shop.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/shop-supabase.js"></script>
 <script src="js/app.js"></script>
 <script>
   let shippingInfo = null;
+  let me = null;
 
-  document.getElementById("shipForm").addEventListener("submit", (e) => {
+  document.getElementById("shipForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+    me = await obcRequireMember();
+    if (!me) return;
     shippingInfo = {
       name: document.getElementById("shipName").value,
       address: document.getElementById("shipAddress").value,
@@ -79,36 +83,32 @@
       zip: document.getElementById("shipZip").value,
     };
     document.getElementById("shippingStep").style.display = "none";
-    renderOrderSummary();
+    await renderOrderSummary();
     renderPaymentStep();
   });
 
-  function groupCartBySeller() {
+  async function groupCartBySeller() {
     const groups = {};
-    cartLines().forEach(l => {
-      const shop = getShopById(l.product.shopId);
-      const key = l.product.shopId;
-      if (!groups[key]) groups[key] = { shop, lines: [] };
+    for (const l of cartLines()) {
+      const key = l.product.shop_id;
+      if (!groups[key]) groups[key] = { shop: await getMemberShopById(key), lines: [] };
       groups[key].lines.push(l);
-    });
+    }
     return Object.values(groups);
   }
 
-  function renderOrderSummary() {
-    const groups = groupCartBySeller();
+  async function renderOrderSummary() {
+    const groups = await groupCartBySeller();
     const card = document.getElementById("orderSummaryCard");
     card.style.display = "block";
     card.className = "card";
     card.innerHTML = `
       <h3>Order summary</h3>
-      ${groups.map(g => {
-        const subtotal = g.lines.reduce((s, l) => s + l.product.price * l.qty, 0);
-        return `
+      ${groups.map(g => `
         <div style="margin:12px 0; padding-bottom:12px; border-bottom:1px solid var(--line);">
           <div class="muted" style="font-size:.8rem; text-transform:uppercase; letter-spacing:.04em;">${g.shop ? g.shop.name : "Shop"}</div>
-          ${g.lines.map(l => `<div style="display:flex; justify-content:space-between; font-size:.92rem; margin-top:4px;"><span>${l.qty} × ${l.product.title}${l.variant ? " (" + l.variant + ")" : ""}</span><span>$${(l.product.price * l.qty).toFixed(2)}</span></div>`).join("")}
-        </div>`;
-      }).join("")}
+          ${g.lines.map(l => `<div style="display:flex; justify-content:space-between; font-size:.92rem; margin-top:4px;"><span>${l.qty} × ${l.product.title}${l.variant ? " (" + l.variant + ")" : ""}</span><span>$${(Number(l.product.price) * l.qty).toFixed(2)}</span></div>`).join("")}
+        </div>`).join("")}
       <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.1rem; margin-top:8px;">
         <span>Total</span><span class="price-now">$${cartTotal().toFixed(2)}</span>
       </div>
@@ -139,17 +139,21 @@
     });
   }
 
-  function placeTheOrder() {
-    const order = placeOrder(shippingInfo);
+  async function placeTheOrder() {
+    const order = await placeOrder(shippingInfo, me.id);
     document.getElementById("orderSummaryCard").style.display = "none";
     document.getElementById("paymentStep").style.display = "none";
     const step = document.getElementById("confirmStep");
     step.style.display = "block";
+    if (!order) {
+      step.innerHTML = `<div class="card" style="text-align:center; padding:40px 24px;"><p>Something went wrong placing your order. Please try again.</p></div>`;
+      return;
+    }
     step.innerHTML = `
       <div class="card" style="border-color: rgba(0,196,140,0.4); text-align:center; padding:40px 24px;">
         <div style="font-size:2.4rem;">&#9989;</div>
         <h2>Order placed</h2>
-        <p>Order <strong>#${order.id}</strong> — $${order.total.toFixed(2)} total across ${order.subOrders.length} shop${order.subOrders.length > 1 ? "s" : ""}.</p>
+        <p>Order confirmed — $${Number(order.total).toFixed(2)} total.</p>
         <p class="muted">Shipping to ${shippingInfo.name}, ${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.zip}</p>
         <a href="shop.html" class="btn btn-ghost" style="margin-top:16px;">Continue shopping &rarr;</a>
       </div>

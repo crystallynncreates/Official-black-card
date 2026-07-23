@@ -51,7 +51,7 @@
       <input id="zipFilter" class="sb-zip" type="text" inputmode="numeric" placeholder="Zip code" />
       <button class="btn btn-primary" onclick="renderActions()">Find my local links</button>
     </div>
-    <p class="muted" style="margin-top:12px;">Enter your city/state and every card below will link straight to a search for your exact area. Leave it blank to see the general/nationwide links.</p>
+    <p class="muted" style="margin-top:12px;">Enter your city/state — cards below link straight to your city's real 311/services portal where we have it on file (currently NYC, Chicago, Houston, LA, Philadelphia, Atlanta, DC, San Francisco, Boston &amp; Detroit), or to a real government directory to find yours if we don't. No search-engine links, ever.</p>
 
     <div class="grid grid-2" id="actionsGrid" style="margin-top:24px;"></div>
   </div>
@@ -72,16 +72,17 @@
     stateSelect.appendChild(opt);
   });
 
-  function localSearchUrl(query, city, state, zip) {
-    const place = [city, state, zip].filter(Boolean).join(" ") || "your area";
-    return `https://www.google.com/search?q=${encodeURIComponent(place + " " + query)}`;
+  function findCurated311(city, state) {
+    if (!city && !state) return null;
+    const c = city.toLowerCase().trim();
+    return CURATED_311.find(entry =>
+      (c && entry.city.toLowerCase() === c) || (state && !c && entry.state === state)
+    ) || null;
   }
 
   function renderActions() {
     const city = document.getElementById("cityFilter").value.trim();
     const state = stateSelect.value;
-    const zip = document.getElementById("zipFilter").value.trim();
-    const hasLocation = !!(city || state || zip);
     const grid = document.getElementById("actionsGrid");
     grid.innerHTML = "";
 
@@ -97,9 +98,14 @@
         }
       } else if (a.linkType === "mixed") {
         linksHtml = `<a href="${a.linkUrl}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:6px;">${a.linkLabel} &rarr;</a>
-          <a href="${localSearchUrl(a.localQuery, city, state, zip)}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${hasLocation ? "Your state's permit rules" : "Find your state's permit rules"} &rarr;</a>`;
-      } else {
-        linksHtml = `<a href="${localSearchUrl(a.localQuery, city, state, zip)}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${hasLocation ? a.linkLabel.replace("your city", city || state || "your area") : a.linkLabel} &rarr;</a>`;
+          <a href="${a.secondaryUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${a.secondaryLabel} &rarr;</a>`;
+      } else if (a.linkType === "curated311") {
+        const match = findCurated311(city, state);
+        linksHtml = match
+          ? `<a href="${match.url}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">Open ${match.name} &rarr;</a>`
+          : `<p class="muted" style="font-size:.85rem; margin:8px 0;">We don't have a direct 311 link for your city yet.</p><a href="${STATE_LOCAL_GOV_DIRECTORY}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:2px;">Find your city's official government site &rarr;</a>`;
+      } else if (a.linkType === "directoryFallback") {
+        linksHtml = `<a href="${STATE_LOCAL_GOV_DIRECTORY}" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:6px;">${a.linkLabel} &rarr;</a>`;
       }
 
       card.innerHTML = `
