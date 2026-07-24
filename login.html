@@ -122,7 +122,10 @@
   async function afterSignedIn() {
     const member = await obcGetMyMember();
     if (member) {
-      window.location.href = "profile.html";
+      // A completed profile no longer forces the profile page as a landing spot — that's what
+      // the avatar icon in the top-right of every page is for now. Signing in goes to the live
+      // home feed instead.
+      window.location.href = "index.html";
       return;
     }
     document.getElementById("loginStep").style.display = "none";

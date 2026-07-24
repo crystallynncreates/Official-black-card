@@ -10,23 +10,35 @@ function obcFaviconImg(url, size) {
   return `<img src="${src}" alt="" style="width:${s}px;height:${s}px;border-radius:4px;object-fit:contain;background:#fff;padding:2px;" onerror="this.style.display='none'" />`;
 }
 
-// Shared behavior across pages: mobile nav toggle + cart badge.
+// Shared behavior across pages: app launcher, nav avatar, cart/message badges.
 document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.querySelector(".nav-toggle");
-  const links = document.querySelector(".nav-links");
-  if (toggle && links) {
-    toggle.addEventListener("click", () => {
-      const open = links.style.display === "flex";
-      links.style.display = open ? "none" : "flex";
-      links.style.flexDirection = "column";
-      links.style.position = "absolute";
-      links.style.top = "58px";
-      links.style.left = "0";
-      links.style.right = "0";
-      links.style.background = "#111116";
-      links.style.padding = "18px 24px";
-      links.style.borderBottom = "1px solid #2b2b38";
+  // App launcher — the grid-icon button in the upper-left of the nav that opens a panel
+  // of every topic. Replaces the old hamburger/nav-links mobile menu everywhere.
+  const launcherBtn = document.getElementById("launcherBtn");
+  const launcherPanel = document.getElementById("appLauncherPanel");
+  if (launcherBtn && launcherPanel) {
+    launcherBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = launcherPanel.classList.toggle("open");
+      launcherBtn.setAttribute("aria-expanded", open ? "true" : "false");
     });
+    document.addEventListener("click", (e) => {
+      if (launcherPanel.classList.contains("open") && !launcherPanel.contains(e.target) && e.target !== launcherBtn) {
+        launcherPanel.classList.remove("open");
+        launcherBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  // Nav avatar — shows the signed-in member's initials once loaded (falls back to a
+  // generic icon already in the markup if this never resolves, e.g. offline).
+  const navAvatar = document.getElementById("navAvatar");
+  if (navAvatar && typeof obcGetMyMember === "function") {
+    obcGetMyMember().then((member) => {
+      if (member) {
+        navAvatar.textContent = `${(member.first_name || "?")[0]}${(member.last_name || "")[0] || ""}`.toUpperCase();
+      }
+    }).catch(() => {});
   }
 
   // Cart badge — reads localStorage directly so it works on every page, even ones
