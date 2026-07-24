@@ -159,7 +159,14 @@
     const referral = document.getElementById("referral").value.trim();
     const zip = document.getElementById("signupZip").value.trim();
 
-    const { data, error } = await obcClient.auth.signUp({ email, password });
+    // Explicitly set the confirmation redirect target from the current page's own URL, rather
+    // than relying solely on the Supabase dashboard's "Site URL" setting — that field is easy to
+    // mis-set to the bare github.io domain (which serves a different, unrelated site) instead of
+    // this app's actual /Official-black-card/ subpath. This always resolves correctly regardless
+    // of the dashboard config, as long as this exact URL is also in the dashboard's Redirect URLs
+    // allow-list (already covered by the wildcard added there).
+    const redirectTo = new URL("login.html", window.location.href).href;
+    const { data, error } = await obcClient.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
 
     submitBtn.disabled = false;
     submitBtn.textContent = "Verify & Join";
