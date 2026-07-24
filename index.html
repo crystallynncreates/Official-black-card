@@ -60,17 +60,66 @@
       <p style="margin:6px 0 0;">If nobody has claimed the founding membership yet, <a href="signup.html" style="color:var(--gold-bright); text-decoration:underline;">sign up</a> and leave the referral field blank to claim it.</p>
     </div>
 
+    <div id="revealStep" style="display:none; text-align:center;">
+      <p class="muted" style="text-transform:uppercase; letter-spacing:.08em; font-size:.8rem; margin-bottom:18px;">&#10003; Membership verified</p>
+
+      <div class="official-card">
+        <div class="sparkle s1"></div>
+        <div class="sparkle s2"></div>
+        <div class="sparkle s3"></div>
+        <div class="sparkle s4"></div>
+        <div class="cw-top">
+          <div class="cw-number" id="cardNumber"></div>
+        </div>
+        <div class="cw-bottom">
+          <div class="cw-name" id="cardName"></div>
+          <div class="cw-since" id="cardSince"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:32px; text-align:left;">
+        <p style="font-size:1.05rem; color:var(--cream);">Official Black Card — and it isn't given lightly.</p>
+        <p>Official Black Card is invitation-only. Every member here was vouched for by someone who believed they belonged, and now you carry that same trust. Use this space to stay connected, and to build the kind of brotherly and sisterly bonds that strengthen not just your own home, but our communities across this nation and around the world.</p>
+        <p style="margin-bottom:0;">And when you meet a Black person who carries that same spirit — invite them. Growing our communities from within is the whole point.</p>
+      </div>
+
+      <div style="display:flex; gap:12px; justify-content:center; margin-top:24px; flex-wrap:wrap;">
+        <a href="welcome.html" class="btn btn-primary">Continue to Welcome &rarr;</a>
+        <a href="invite.html" class="btn btn-ghost">Invite someone now</a>
+      </div>
+    </div>
+
   </div>
 </section>
 
 <footer class="footer">
-  <div class="container center"><p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p></div>
+  <div class="container center"><p style="margin-bottom:10px;">&copy; 2026 Official Black Card</p><img src="img/clc-logo.png" alt="Crystal Lynn Creates" style="width:52px;height:52px;object-fit:contain;margin:0 auto;opacity:.9;display:block;" /></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/app.js"></script>
 <script>
+  function fireConfetti() {
+    if (typeof confetti !== "function") return;
+    const colors = ["#e8b33d", "#f5d78a", "#111116", "#ffffff"];
+    confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 }, colors });
+    setTimeout(() => confetti({ particleCount: 80, spread: 100, origin: { y: 0.4 }, colors }), 250);
+  }
+
+  function showCard(member) {
+    document.getElementById("loginStep").style.display = "none";
+    document.getElementById("finishStep").style.display = "none";
+    document.getElementById("founderNote").style.display = "none";
+    const step = document.getElementById("revealStep");
+    step.style.display = "block";
+    document.getElementById("cardNumber").textContent = obcFormatMemberNumber(member.membership_number);
+    document.getElementById("cardName").textContent = `${member.first_name} ${member.last_name}`;
+    document.getElementById("cardSince").textContent = "Member since " + new Date(member.joined_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    fireConfetti();
+  }
+
   async function afterSignedIn() {
     const member = await obcGetMyMember();
     if (member) {
@@ -129,11 +178,12 @@
         : result.error.message;
       return;
     }
-    window.location.href = "profile.html";
+    showCard(result.data);
   });
 
-  // If they're already signed in, skip straight to the right step. Otherwise only show the
-  // "first time here" founder note while that slot is still unclaimed.
+  // If they're already signed in (e.g. clicked back), skip straight to the right step.
+  // Otherwise, only show the "first time here" founder note while that slot is still unclaimed —
+  // once someone (Crystal) has signed in as the founder, it no longer applies to anyone.
   (async () => {
     const session = await obcGetSession();
     if (session) { await afterSignedIn(); return; }

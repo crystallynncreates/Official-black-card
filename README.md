@@ -119,6 +119,15 @@ Every searchable page now uses the same 3-field pattern: **State dropdown + City
 
 No image-generation or stock-photo tool is available in this environment (see "Photo strategy" further down), so instead of fabricating pictures, every card that links to an external source now shows that **source's own real favicon** — `obcFavicon(url)` / `obcFaviconImg(url, size)` in `js/app.js`, computed client-side as `new URL(url).origin + "/favicon.ico"`. No third-party favicon proxy (several exist as `google.com/s2/favicons?...` — deliberately not used, given the no-Google directive above), no fabrication — just the real organization's own icon, hotlinked from their own domain, with `onerror` hiding it gracefully if a site doesn't serve one. Applied to Directory (listings + partner sources), Jobs (postings + sources), Homeschool (org sources + grants), Community (every civic-action link), and Watch (every story's source link).
 
+## Card reveal: bug fix + sparkle/confetti/flip (2026-07-27)
+
+**Fixed:** the "finish setup" path on `login.html`/`index.html` (used by anyone who signs in after their email is already confirmed — including Crystal's own founder claim) previously called `obc_founder_signup`/`obc_signup` and then redirected straight to `profile.html`, **never rendering the Official Black Card reveal at all**. That markup/logic only existed in `signup.html`. Both `login.html` and `index.html` now have the same `revealStep`/`.official-card` markup and a `showCard()` function, called with `showCard(result.data)` instead of the old `window.location.href = "profile.html"`. If you touch the finish-setup flow again, remember `index.html` and `login.html` must stay identical (see "Landing page = login page" above).
+
+- **Sparkle:** `.official-card .sparkle` (4 diamond-shaped elements, `css/styles.css`) twinkle over the ring/"O" in the card artwork on every card reveal, via a staggered `@keyframes twinkle`.
+- **Confetti:** `canvas-confetti` (CDN, `js/...confetti.browser.min.js`) fires a two-burst gold/cream/black confetti animation inside `showCard()`, on both `signup.html` and `login.html`/`index.html` — plays once, when the card is first issued.
+- **Card flip:** `profile.html`'s `.member-card` gets a `flip-once` class added right after the member's real data loads, triggering a single `rotateY(0→180→360deg)` spin (`@keyframes cardFlipOnce`, `css/styles.css`) — plays once per page load, not on every visit's re-render (it's added once in the same async block that populates the card).
+- **Footer redesign (all 21 pages):** centered "Official Black Card" copyright line, "Crystal Lynn Creates" text line removed, replaced with the Crystal Lynn Creates floral-wreath "CL" logo (`img/clc-logo.png`) centered below it.
+
 ## No more search-engine links (as of 2026-07-25)
 
 Crystal's direct feedback: "I don't want links that lead to Google — if they have to go to Google, what good is the site?" `community.html` previously built a live Google search query for every hyper-local civic action (block captain, 311, non-emergency police, gun permits) — technically functional but not the app actually doing the work. Replaced with:

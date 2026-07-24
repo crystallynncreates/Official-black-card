@@ -120,7 +120,7 @@
 
 <footer class="footer">
   <div class="container center">
-    <p>&copy; 2026 Official Black Card &middot; Crystal Lynn Creates</p>
+    <p style="margin-bottom:10px;">&copy; 2026 Official Black Card</p><img src="img/clc-logo.png" alt="Crystal Lynn Creates" style="width:52px;height:52px;object-fit:contain;margin:0 auto;opacity:.9;display:block;" />
   </div>
 </footer>
 
@@ -140,6 +140,7 @@
     document.getElementById("pAvatar").textContent = initials(`${me.first_name} ${me.last_name}`);
     document.getElementById("pMeta").textContent = "Member since " + new Date(me.joined_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
     document.getElementById("pBio").textContent = me.bio || "No bio yet.";
+    document.querySelector(".member-card").classList.add("flip-once");
     document.getElementById("zipInput").value = me.zip || "";
     document.getElementById("zipForm").addEventListener("submit", async (e) => {
       e.preventDefault();
