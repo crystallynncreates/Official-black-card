@@ -438,7 +438,7 @@ p { margin: 0 0 1em; color: var(--cream-dim); }
 .daily-banner .ref { color: var(--gold-bright); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; }
 .daily-banner .gratitude { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); font-style: italic; color: var(--cream-dim); }
 
-/* ===== Official Black Card reveal ===== */
+/* ===== Official Black Card reveal — real card-face artwork ===== */
 @keyframes cardIn {
   0% { opacity: 0; transform: translateY(24px) scale(0.96); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -453,25 +453,46 @@ p { margin: 0 0 1em; color: var(--cream-dim); }
   margin: 0 auto;
   aspect-ratio: 1.586 / 1;
   border-radius: 22px;
-  padding: 28px;
-  background:
-    linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.16) 50%, transparent 60%),
-    radial-gradient(120% 140% at 0% 0%, #232330, #0a0a0d 70%);
-  background-size: 250% 100%, 100% 100%;
-  animation: cardIn 0.7s cubic-bezier(.2,.8,.2,1) both, shimmerSweep 3.2s ease-in-out 0.6s 2;
+  padding: 22px 28px;
+  background-color: #000;
+  background-image: url("../img/official-black-card.png");
+  background-size: cover;
+  background-position: center;
+  animation: cardIn 0.7s cubic-bezier(.2,.8,.2,1) both;
   border: 1px solid rgba(232,179,61,0.45);
   box-shadow: 0 30px 70px -25px rgba(0,0,0,0.7), 0 0 40px -10px rgba(232,179,61,0.25);
   color: var(--cream);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
-.official-card .cw-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.official-card .cw-brand { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; font-size: 0.85rem; text-transform: uppercase; color: var(--gold-bright); }
-.official-card .cw-chip { width: 38px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--gold-bright), var(--gold)); }
-.official-card .cw-number { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.14em; margin: 10px 0 4px; }
-.official-card .cw-name { font-size: 1.05rem; font-weight: 600; }
-.official-card .cw-since { font-size: 0.7rem; color: var(--cream-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+/* Holographic sheen sweeping over the artwork, independent of the background-image */
+.official-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.20) 50%, transparent 60%);
+  background-size: 250% 100%;
+  animation: shimmerSweep 3.2s ease-in-out 0.6s 2;
+  pointer-events: none;
+}
+.official-card .cw-top { position: relative; z-index: 1; text-align: center; }
+.official-card .cw-number {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.16em;
+  padding: 5px 16px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(232,179,61,0.5);
+  color: var(--gold-bright);
+  text-shadow: 0 0 12px rgba(232,179,61,0.5);
+}
+.official-card .cw-bottom { position: relative; z-index: 1; text-align: center; }
+.official-card .cw-name { font-size: 1.05rem; font-weight: 600; text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
+.official-card .cw-since { font-size: 0.7rem; color: var(--cream-dim); text-transform: uppercase; letter-spacing: 0.06em; text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
 
 /* ===== Messages ===== */
 .msg-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; min-height: 480px; }
